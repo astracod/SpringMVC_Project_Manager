@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd
+      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.5.xsd">
+    <changeSet id="v01-1" author="DmitriyZhylicov">
+
+        <createTable tableName="users">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="first_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <insert tableName="users">
+            <column name="first_name" value="Ivan"/>
+            <column name="last_name" value="Ivanov"/>
+        </insert>
+
+        <insert tableName="users">
+            <column name="first_name" value="Denis"/>
+            <column name="last_name" value="Denisov"/>
+        </insert>
+
+    </changeSet>
+
+    <changeSet id="v01-2" author="DmitriyZhylicov">
+
+        <createTable tableName="projects">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="project_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints foreignKeyName="projects_users_id" referencedTableName="users"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+
+        <insert tableName="projects">
+            <column name="project_name" value="Test project № 1 for Ivanov"/>
+        </insert>
+        <insert tableName="projects">
+            <column name="project_name" value="Test project № 2 for Ivanov"/>
+        </insert>
+        <insert tableName="projects">
+            <column name="project_name" value="Test project № 1 for Denisov"/>
+        </insert>
+
+    </changeSet>
+
+
+    <changeSet id="v01-3" author="DmitriyZhylicov">
+        <createTable tableName="tasks">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="task_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_create_task" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT">
+                <constraints foreignKeyName="tasks_projects_id" referencedTableName="projects"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+
+        <insert tableName="tasks">
+            <column name="task_name" value="Test task № 1 for Ivanov"/>
+            <column name="date_create_task" value="2021-10-11 19:45:06"/>
+        </insert>
+        <insert tableName="tasks">
+            <column name="task_name" value="Test task № 1 for Denisov"/>
+            <column name="date_create_task" value="2021-10-12 10:10:10"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
