@@ -23,24 +23,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/login").anonymous()
-               .antMatchers("/").authenticated()
-               .and().csrf().disable()
-               .formLogin()
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .failureUrl("/login?error=true")
-                .usernameParameter("email")
-               .and()
-               .logout();
-             /*   .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .and()
-                .httpBasic()
-                .and()
-                .logout();*/
-
+                   .antMatchers("/login").anonymous()
+                  .antMatchers("/").authenticated()
+                  .and().csrf().disable()
+                  .formLogin()
+                   .loginPage("/login")
+                  .and()
+                  .logout();
     }
 
     @Override

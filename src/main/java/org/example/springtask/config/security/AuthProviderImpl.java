@@ -40,6 +40,7 @@ public class AuthProviderImpl implements AuthenticationProvider {
 
         SecurityWorkerDto workerDto = projectService.getWorkerByEmail(email);
 
+
         if (!passwordEncoder.matches(password, workerDto.getPassword())) {
             throw new BadCredentialsException(" Внимание!!! Пароль не верен.");
         }

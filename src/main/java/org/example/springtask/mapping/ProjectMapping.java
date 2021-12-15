@@ -28,7 +28,7 @@ public class ProjectMapping {
         workerDto.setId(worker.getId());
         workerDto.setFirstName(worker.getFirstName());
         workerDto.setLastName(worker.getLastName());
-        workerDto.setEmail(worker.getLogin());
+        workerDto.setUsername(worker.getLogin());
         workerDto.setPassword(worker.getPassword());
         return workerDto;
     }
