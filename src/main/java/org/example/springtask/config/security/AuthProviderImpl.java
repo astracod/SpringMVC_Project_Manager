@@ -20,10 +20,12 @@ import java.util.List;
 @Component
 public class AuthProviderImpl implements AuthenticationProvider {
 
+
     private final ProjectService projectService;
 
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
     public AuthProviderImpl(ProjectService projectService, PasswordEncoder passwordEncoder) {
         this.projectService = projectService;
         this.passwordEncoder = passwordEncoder;

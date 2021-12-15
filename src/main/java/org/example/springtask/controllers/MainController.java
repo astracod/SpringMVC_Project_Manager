@@ -1,4 +1,4 @@
-package org.example.springtask;
+package org.example.springtask.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class MainController {
         this.projectService = projectService;
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public String test() {
         return "Spring Core Application";
     }

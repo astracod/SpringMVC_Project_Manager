@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @EnableWebSecurity
-@ComponentScan(basePackages = "org.example.springtask.config.security")
+@ComponentScan(basePackages = "org.example.springtask")
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -23,15 +23,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/login","/saveWorker").anonymous()
+                .antMatchers("/login").anonymous()
                .antMatchers("/").authenticated()
                .and().csrf().disable()
                .formLogin()
-               .and()
-               .httpBasic()
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .failureUrl("/login?error=true")
+                .usernameParameter("email")
                .and()
                .logout();
-              /*  .anyRequest().authenticated()
+             /*   .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .and()
