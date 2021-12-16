@@ -4,7 +4,7 @@
     <title>Login page</title>
 </head>
 <body>
-<h1>Login page</h1>
+<h1>Аутентификация</h1>
 
 <form th:action="@{/login}" method="post">
     <div th:if="${param.error}">
@@ -15,12 +15,19 @@
         <p class="text-warning">You have been logged out.</p>
     </div>
     <label for="username">Username</label>:
-    <input type="text" id="username" name="username" autofocus="autofocus" /> <br />
+    <input type="text" id="username" name="username" autofocus="autofocus"/> <br/>
     <label for="password">Password</label>:
-    <input type="password" id="password" name="password" /> <br />
-    <input type="submit" value="Log in" />
+    <input type="password" id="password" name="password"/> <br/>
+    <input type="submit" value="Log in"/>
+
 </form>
 
+<form method="LINK" th:action="@{/registration}">
+    <input type="submit" value="Зарегистрироваться">
+</form>
+<form method="LINK" th:action="@{/logout}">
+    <input type="submit" value="Выйти из системы">
+</form>
 
 </body>
 </html>

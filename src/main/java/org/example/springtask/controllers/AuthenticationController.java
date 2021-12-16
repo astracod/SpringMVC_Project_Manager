@@ -1,36 +1,35 @@
 package org.example.springtask.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.springtask.dto.SecurityWorkerDto;
 import org.example.springtask.dto.WorkerDto;
 import org.example.springtask.services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
 
 @Slf4j
+@RequiredArgsConstructor
 @Controller("AuthenticationController")
-@ComponentScan(basePackages = "org.example.springtask.services")
 public class AuthenticationController {
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-
-    @GetMapping(value = "sign_up")
+    @GetMapping(value = "/registration")
     public String getSaveWorker(Model model) {
-        model.addAttribute("worker", new WorkerDto());
-        return "sign_up";
+        model.addAttribute("worker", new SecurityWorkerDto());
+        return "/registration";
     }
 
-    @PostMapping(value = "sign_up")
-    public String saveWorker(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String login, @RequestParam String password) {
-        projectService.saveWorker(firstName, lastName, login, password);
-        return "redirect:/sign_in";
+    @PostMapping(value = "/registration")
+    public String saveWorker(@ModelAttribute SecurityWorkerDto worker) {
+        projectService.saveWorker(worker.getFirstName(), worker.getLastName(), worker.getUsername(), worker.getPassword());
+        return "redirect:/login";
     }
 
 
@@ -43,6 +42,8 @@ public class AuthenticationController {
         model.addAttribute("userForm", new WorkerDto());
         return "login";
     }
+
+
 
 
 }

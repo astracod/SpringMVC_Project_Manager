@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
-@Service
+@Service(value = "projectService")
 public class ProjectService {
 
     private ProjectDAO projectDao;
@@ -37,8 +37,14 @@ public class ProjectService {
     }
 
     public Status saveWorker(String firstName, String lastName, String login, String password) {
-        String codPassword = passwordEncoder.encode(password);
-        return projectDao.createWorker(firstName, lastName, login, codPassword);
+        Status status = new Status();
+        if (firstName == null || lastName == null || login == null || password == null){
+            status.setStatus("Заполните все требуемые поля данных пользователя при регистрации.");
+        }else {
+            String codPassword = passwordEncoder.encode(password);
+            status = projectDao.createWorker(firstName, lastName, login, codPassword);
+        }
+        return  status;
     }
 
     public Status removeWorker(Integer workerId) {
