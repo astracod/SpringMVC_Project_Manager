@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
-@Repository
+@Repository(value = "projectDaoImpl")
 public class ProjectDaoImpl implements ProjectDAO {
 
 

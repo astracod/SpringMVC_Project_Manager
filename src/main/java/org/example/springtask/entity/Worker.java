@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity(name = "Worker")
 @Table(name = "users")
-public class Worker {
+public class Worker  {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,9 @@ public class Worker {
     private String login;
     @Column(name = "password")
     private String password;
-
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
 
     @ManyToMany(mappedBy = "workers")
    /* @JoinTable(name = "user_project",

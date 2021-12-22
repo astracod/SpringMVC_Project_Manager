@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.springtask.dto.*;
 import org.example.springtask.entity.Task;
 import org.example.springtask.services.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,36 +15,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MainController {
 
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    public MainController(ProjectService projectService) {
-        this.projectService = projectService;
-    }
 
     @GetMapping("/")
     public String test() {
-        return "Spring Core Application";
+        return "You are logged in ";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("showWorkers")
     public List getAllWorkers() {
         return projectService.showAllUsers();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("showWorker")
     public WorkerDto getWorker(Integer workerId) {
         return projectService.getWorker(workerId);
     }
 
     @PostMapping("showWorkerById")
-    public FullWorkerDto getAllInfoByWorkerId(Integer workerId){
+    public FullWorkerDto getAllInfoByWorkerId(Integer workerId) {
         return projectService.getAllInfoByWorkerId(workerId);
     }
 
     @PutMapping("saveWorker")
-    public Status saveWorker(@RequestParam String firstName, @RequestParam String lastName,@RequestParam String login, @RequestParam String password) {
-        return projectService.saveWorker(firstName, lastName,login,password);
+    public Status saveWorker(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String login, @RequestParam String password) {
+        return projectService.saveWorker(firstName, lastName, login, password);
     }
 
     @DeleteMapping("removeWorker")
@@ -58,7 +56,9 @@ public class MainController {
     }
 
     @GetMapping("getById")
-    public ProjectDto allProjects(Integer projectId){return projectService.getAllExecutorProjectsByProjectId(projectId);}
+    public ProjectDto allProjects(Integer projectId) {
+        return projectService.getAllExecutorProjectsByProjectId(projectId);
+    }
 
     @GetMapping("showProject")
     public OnlyProjectInfoDto getOnlyProjectInfo(Integer projectId) {
@@ -81,7 +81,7 @@ public class MainController {
     }
 
     @PostMapping("updateNameProject")
-    public Status changeProjectName(Integer projectId,String newNameProject) {
+    public Status changeProjectName(Integer projectId, String newNameProject) {
         return projectService.changeProjectName(projectId, newNameProject);
     }
 
@@ -112,7 +112,7 @@ public class MainController {
 
     @PostMapping("assignExecutor")
     public Status assignAnExecutorToTask(Integer taskId, Integer workerId) {
-       return projectService.assignAnExecutorToTask(taskId,workerId);
+        return projectService.assignAnExecutorToTask(taskId, workerId);
     }
 
     @PostMapping("removeExecutor")

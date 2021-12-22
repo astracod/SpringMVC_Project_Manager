@@ -14,19 +14,34 @@
     <div th:if="${param.logout}">
         <p class="text-warning">You have been logged out.</p>
     </div>
-    <label for="username">Username</label>:
-    <input type="text" id="username" name="username" autofocus="autofocus"/> <br/>
-    <label for="password">Password</label>:
-    <input type="password" id="password" name="password"/> <br/>
-    <input type="submit" value="Log in"/>
+    <th:p>
+        <label for="username">Username</label>:
+        <input type="text" id="username" name="username" autofocus="autofocus"/> <br/>
+    </th:p>
+
+    <th:p>
+        <label for="password">Password</label>:
+        <input type="password" id="password" name="password"/> <br/>
+    </th:p>
+
+    <th:p>
+        <input type="submit" value="Log in"/>
+    </th:p>
+
 
 </form>
 
 <form method="LINK" th:action="@{/registration}">
-    <input type="submit" value="Зарегистрироваться">
+    <th:p>
+        <input type="submit" value="Зарегистрироваться">
+    </th:p>
+
 </form>
 <form method="LINK" th:action="@{/logout}">
-    <input type="submit" value="Выйти из системы">
+    <th:p>
+        <input type="submit" value="Выйти из системы">
+    </th:p>
+
 </form>
 
 </body>

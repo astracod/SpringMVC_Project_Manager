@@ -5,12 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.springtask.dto.SecurityWorkerDto;
 import org.example.springtask.dto.WorkerDto;
 import org.example.springtask.services.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Slf4j
@@ -19,9 +18,13 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     private final ProjectService projectService;
+    private final MainController mainController;
 
     @GetMapping(value = "/registration")
-    public String getSaveWorker(Model model) {
+    public String getSaveWorker(@RequestParam(name = "error", required = false) Boolean error, Model model) {
+        if (Boolean.TRUE.equals(error)) {
+            model.addAttribute("error", true);
+        }
         model.addAttribute("worker", new SecurityWorkerDto());
         return "/registration";
     }
@@ -34,8 +37,7 @@ public class AuthenticationController {
 
 
     @RequestMapping("/login")
-    public String login(@RequestParam(name = "error", required = false) Boolean error,
-                        Model model) {
+    public String login(@RequestParam(name = "error", required = false) Boolean error, Model model) {
         if (Boolean.TRUE.equals(error)) {
             model.addAttribute("error", true);
         }
@@ -43,7 +45,9 @@ public class AuthenticationController {
         return "login";
     }
 
-
-
+    @GetMapping("/index")
+    public String getIndexPage(){
+        return "index";
+    }
 
 }
