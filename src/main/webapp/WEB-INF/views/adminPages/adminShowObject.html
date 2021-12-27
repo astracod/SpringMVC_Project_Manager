@@ -25,6 +25,10 @@
     <button type="submit">Показать все задачи</button>
 </form>
 <br/>
+<form method="post" th:action="@{/adminWorkObject}">
+    <button type="submit">На страницу работы над объектами</button>
+</form>
+<br/>
 <hr>
 <form th:action="@{/logout}" method="POST">
     <button type="submit">Logout</button>

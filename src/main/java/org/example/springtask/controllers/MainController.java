@@ -24,7 +24,7 @@ public class MainController {
     public String sortByRole(Authentication auth) {
         String myRole = auth.getAuthorities().stream().findFirst().get().toString();
         if (myRole.equals("ADMIN")) {
-            return "adminPages/admin";
+            return "adminPages/adminShowObject";
         }
         return "userPages/user";
     }
@@ -104,14 +104,19 @@ public class MainController {
         return projectService.getOnlyProjectInfo(projectId);
     }
 
-    @PutMapping("createProject")
-    public Status changeProject(String nameProject) {
-        return projectService.createProject(nameProject);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("createProject")
+    public String changeProject(@RequestParam(value = "nameProject") String nameProject, Model model) {
+        Status status = projectService.createProject(nameProject);
+        model.addAttribute("status", status.getStatus());
+        return "adminPages/adminWorkOnObjects";
     }
-
-    @DeleteMapping("removeProject")
-    public Status removeProject(Integer projectId) {
-        return projectService.removeProject(projectId);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("removeProject")
+    public String removeProject(@RequestParam(value = "projectId")Integer projectId, Model model) {
+        Status status = projectService.removeProject(projectId);
+        model.addAttribute("status", status.getStatus());
+        return "adminPages/adminWorkOnObjects";
     }
 
     @PostMapping("addExecutor")

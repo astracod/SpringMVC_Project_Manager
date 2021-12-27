@@ -211,6 +211,9 @@ public class ProjectDaoImpl implements ProjectDAO {
 
     @Override
     public Status createProject(String nameProject) {
+        if (nameProject.isEmpty()){
+            return getStatus("Задайте название проекту.");
+        }
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         Project project = new Project();

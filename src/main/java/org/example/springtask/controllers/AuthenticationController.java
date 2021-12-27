@@ -50,6 +50,11 @@ public class AuthenticationController {
 
     @PostMapping("/admin")
     public String getAdminPage(){
-        return "adminPages/admin";
+        return "adminPages/adminShowObject";
+    }
+
+    @PostMapping("/adminWorkObject")
+    public String getAdminObjectPage(){
+        return "adminPages/adminWorkOnObjects";
     }
 }
