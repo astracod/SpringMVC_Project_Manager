@@ -1,0 +1,38 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<head>
+    <title>Сотрудники</title>
+</head>
+<body>
+<h1>Показать всех сотрудников : </h1>
+<div>
+    <tr th:each="worker : ${listW}">
+        <p>
+            <th:label> Id сотрудника :</th:label>
+        <td th:text="${worker.id}"></td>
+        <br/>
+        <th:label>| Имя сотрудника :</th:label>
+        <td th:text="${worker.firstName}"></td>
+        <br/>
+        <th:label>| Фамилия сотрудника :</th:label>
+        <td th:text="${worker.lastName}"></td>
+        <br/>
+        <th:label>| Логин сотрудника :</th:label>
+        <td th:text="${worker.email}"></td>
+        </p>
+    </tr>
+    <hr>
+    <br/>
+    <form th:action="@{/admin}" method="post">
+        <button type="submit">Вернуться к запросам</button>
+    </form>
+</div>
+</body>
+</html>

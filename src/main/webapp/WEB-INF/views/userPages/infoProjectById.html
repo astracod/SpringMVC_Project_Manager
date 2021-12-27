@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Информация о проекте</title>
+</head>
+<body>
+<h1>Проект : </h1>
+
+<div>
+    <tr th:each="item : ${project.getWorkersId()}">
+        <p>
+        <th:label>| ID сотрудника :</th:label>
+        <td th:text="${item.id}"></td>
+        <th:label>| Имя сотрудника :</th:label>
+        <td th:text="${item.firstName}"></td>
+        <th:label>| Фамилия сотрудника :</th:label>
+        <td th:text="${item.lastName}"></td>
+        </p>
+    </tr>
+    <br>
+    <tr>
+        <p>
+        <th:label>| ID проекта :</th:label>
+        <td th:text="${project.getId()}"></td>
+        <th:label>| Название проекта :</th:label>
+        <td th:text="${project.getProjectName()}"></td>
+        </p>
+    </tr>
+    <br>
+    <tr th:each="item : ${project.getTasks()}">
+        <p>
+        <th:label>| ID задачи :</th:label>
+        <td th:text="${item.getId()}"></td>
+        <th:label>| Название задачи :</th:label>
+        <td th:text="${item.getTaskName()}"></td>
+        <th:label>| Дата создания задачи :</th:label>
+        <td th:text="${item.getDateCreateTask()}"></td>
+        <th:label>| ID ответственного :</th:label>
+        <td th:text="${item.getUserId()}"></td>
+        </p>
+    </tr>
+
+</div>
+
+<br/>
+<hr>
+<form th:action="@{/user}" method="POST">
+    <button type="submit">Перейти на главную страницу</button>
+</form>
+</body>
+</html>

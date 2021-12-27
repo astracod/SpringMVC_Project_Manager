@@ -1,0 +1,59 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<head>
+    <title>Информация о сотруднике</title>
+</head>
+<body>
+<h1>Сотрудник задействован в : </h1>
+<hr>
+<div>
+
+
+    <tr>
+        <p>
+            <th:label>ID сотрудника :</th:label>
+        <td th:text="${infoAboutUser.getWorker().id}"></td>
+
+        <th:label>| Имя сотрудника :</th:label>
+        <td th:text="${infoAboutUser.getWorker().firstName}"></td>
+        <th:label>| Фамилия сотрудника :</th:label>
+        <td th:text="${infoAboutUser.getWorker().lastName}"></td>
+        </p>
+    </tr>
+    <br/>
+    <tr th:each="project : ${infoAboutUser.getWorker().getProjects()}">
+        <th:label>| Название проекта :</th:label>
+        <td th:text="${project.getProjectName()}"></td>
+    </tr>
+    <br/>
+    <tr th:each="worker : ${infoAboutUser.getTasks()}">
+        <p>
+            <th:label>ID задачи :</th:label>
+        <td th:text="${worker.id}"></td>
+
+        <th:label>| Дата создания задачи :</th:label>
+        <td th:text="${worker.getDateCreateTask()}"></td>
+
+        <th:label>| Название задачи :</th:label>
+        <td th:text="${worker.getTaskName()}"></td>
+        </p>
+    </tr>
+
+    <br/>
+    <hr>
+    <form th:action="@{/user}" method="POST">
+        <button type="submit">Перейти на главную страницу</button>
+    </form>
+
+
+</div>
+
+</body>
+</html>

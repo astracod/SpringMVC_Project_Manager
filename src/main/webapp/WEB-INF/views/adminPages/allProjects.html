@@ -1,0 +1,33 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<head>
+    <title>Проекты</title>
+</head>
+<body>
+<h1>Показать все проекты : </h1>
+
+<div>
+    <tr th:each="project : ${listP}">
+        <p>
+            <th:label>| ID проекта :</th:label>
+        <td th:text="${project.id}"></td>
+        <br/>
+        <th:label>| Название проекта :</th:label>
+        <td th:text="${project.projectName}"></td>
+        </p>
+    </tr>
+    <hr>
+    <br/>
+    <form th:action="@{/admin}" method="post">
+        <button type="submit">Вернуться к запросам</button>
+    </form>
+</div>
+</body>
+</html>
