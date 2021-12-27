@@ -235,6 +235,7 @@ public class ProjectDaoImpl implements ProjectDAO {
         return getStatus(" Проект удален из базы данных.");
     }
 
+
     @Override
     public Status changeProjectName(Integer projectId, String newNameProject) {
         EntityManager em = entityManagerFactory.createEntityManager();

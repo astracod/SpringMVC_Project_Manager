@@ -42,7 +42,7 @@ public class Worker  {
     @JsonIgnore
     private Set<Project> projects = new HashSet<>();
 
-/*    public void addProject(Project project) {
+    public void addProject(Project project) {
         this.projects.add(project);
         project.getWorkers().add(this);
     }
@@ -50,7 +50,7 @@ public class Worker  {
     public void removeProject(Project project) {
         this.projects.remove(project);
         project.getWorkers().remove(this);
-    }*/
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -3,15 +3,17 @@ package org.example.springtask.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.springtask.dto.*;
-import org.example.springtask.entity.Task;
 import org.example.springtask.services.ProjectService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class MainController {
 
@@ -19,25 +21,63 @@ public class MainController {
 
 
     @GetMapping("/")
-    public String test() {
-        return "You are logged in ";
+    public String sortByRole(Authentication auth) {
+        String myRole = auth.getAuthorities().stream().findFirst().get().toString();
+        if (myRole.equals("ADMIN")) {
+            return "adminPages/admin";
+        }
+        return "userPages/user";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("showWorkers")
-    public List getAllWorkers() {
-        return projectService.showAllUsers();
+    public String getAllWorkers(Model model) {
+        List<WorkerDto> listW = projectService.showAllUsers();
+        model.addAttribute("listW", listW);
+        return "adminPages/allWorkers";
     }
 
-    @PreAuthorize("hasRole('USER')")
+    /**
+     * определить по роли
+     *
+     * @param workerId
+     * @return
+     */
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping("showWorker")
     public WorkerDto getWorker(Integer workerId) {
         return projectService.getWorker(workerId);
     }
 
+    /**
+     * получить всю информацию где задействован сотрудник по его ID
+     *
+     * @param workerId
+     * @param model
+     * @return
+     */
+    @PreAuthorize("hasAuthority('USER')")
     @PostMapping("showWorkerById")
-    public FullWorkerDto getAllInfoByWorkerId(Integer workerId) {
-        return projectService.getAllInfoByWorkerId(workerId);
+    public String getAllInfoByWorkerId(@RequestParam(value = "workerId") Integer workerId, Model model) {
+        FullWorkerDto fullWorkerDto = projectService.getAllInfoByWorkerId(workerId);
+        model.addAttribute("infoAboutUser", fullWorkerDto);
+        return "userPages/userInfoByWorkerId";
+    }
+
+
+    /**
+     * получить всю информацию о проекте по его ID (задачи, сотрудники)
+     *
+     * @param projectId
+     * @param model
+     * @return
+     */
+    @PreAuthorize("hasAuthority('USER')")
+    @PostMapping("getById")
+    public String allProjects(@RequestParam(value = "projectId") Integer projectId, Model model) {
+        ProjectDto projectDto = projectService.getAllExecutorProjectsByProjectId(projectId);
+        model.addAttribute("project", projectDto);
+        return "userPages/infoProjectById";
     }
 
     @PutMapping("saveWorker")
@@ -50,15 +90,14 @@ public class MainController {
         return projectService.removeWorker(workerId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("showProjects")
-    public List<OnlyProjectInfoDto> getAllProjects() {
-        return projectService.showAllProjects();
+    public String getAllProjects(Model model) {
+        List<OnlyProjectInfoDto> listP = projectService.showAllProjects();
+        model.addAttribute("listP", listP);
+        return "adminPages/allProjects";
     }
 
-    @GetMapping("getById")
-    public ProjectDto allProjects(Integer projectId) {
-        return projectService.getAllExecutorProjectsByProjectId(projectId);
-    }
 
     @GetMapping("showProject")
     public OnlyProjectInfoDto getOnlyProjectInfo(Integer projectId) {
@@ -90,9 +129,12 @@ public class MainController {
         return projectService.removeWorkerFromProject(projectId, workerId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("showTasks")
-    public List<Task> getAllTasks() {
-        return projectService.getAllTasks();
+    public String getAllTasks(Model model) {
+        List<TaskDto> tasks = projectService.getAllTasks();
+        model.addAttribute("tasks", tasks);
+        return "adminPages/allTasks";
     }
 
     @PostMapping("showTask")

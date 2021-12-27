@@ -9,8 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 @Slf4j
 @RequiredArgsConstructor
@@ -18,7 +16,7 @@ import java.util.List;
 public class AuthenticationController {
 
     private final ProjectService projectService;
-    private final MainController mainController;
+   // private final MainController mainController;
 
     @GetMapping(value = "/registration")
     public String getSaveWorker(@RequestParam(name = "error", required = false) Boolean error, Model model) {
@@ -26,13 +24,13 @@ public class AuthenticationController {
             model.addAttribute("error", true);
         }
         model.addAttribute("worker", new SecurityWorkerDto());
-        return "/registration";
+        return "authenticationAndRegistration/registration";
     }
 
     @PostMapping(value = "/registration")
     public String saveWorker(@ModelAttribute SecurityWorkerDto worker) {
         projectService.saveWorker(worker.getFirstName(), worker.getLastName(), worker.getUsername(), worker.getPassword());
-        return "redirect:/login";
+        return "authenticationAndRegistration/login";
     }
 
 
@@ -42,12 +40,16 @@ public class AuthenticationController {
             model.addAttribute("error", true);
         }
         model.addAttribute("userForm", new WorkerDto());
-        return "login";
+        return "authenticationAndRegistration/login";
     }
 
-    @GetMapping("/index")
+    @PostMapping("/user")
     public String getIndexPage(){
-        return "index";
+        return "userPages/user";
     }
 
+    @PostMapping("/admin")
+    public String getAdminPage(){
+        return "adminPages/admin";
+    }
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login page</title>
+    <title>Аутентификация</title>
 </head>
 <body>
 <h1>Аутентификация</h1>
@@ -18,31 +18,25 @@
         <label for="username">Username</label>:
         <input type="text" id="username" name="username" autofocus="autofocus"/> <br/>
     </th:p>
-
+    <br>
     <th:p>
         <label for="password">Password</label>:
         <input type="password" id="password" name="password"/> <br/>
     </th:p>
-
+    <br>
     <th:p>
         <input type="submit" value="Log in"/>
     </th:p>
-
-
 </form>
-
+<br/>
+<hr>
 <form method="LINK" th:action="@{/registration}">
     <th:p>
         <input type="submit" value="Зарегистрироваться">
     </th:p>
 
 </form>
-<form method="LINK" th:action="@{/logout}">
-    <th:p>
-        <input type="submit" value="Выйти из системы">
-    </th:p>
 
-</form>
 
 </body>
 </html>
