@@ -1,0 +1,117 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<head>
+    <title>Работа над объектами</title>
+</head>
+<body>
+<h1>Работа над проектом</h1>
+
+<div>
+    <h1>Ответ системы : </h1>
+    <p th:text="${status}"></p>
+</div>
+<hr/>
+<h1>Создание проекта</h1>
+<br>
+<form method="post" th:action="@{/createProject}">
+    <th:p>
+        <label for="nameProject">Введите название проекта : </label>
+        <br/>
+        <input type="text" id="nameProject" name="nameProject"/> <br/>
+    </th:p>
+    <p>
+        <button type="submit">Создать проект</button>
+    </p>
+</form>
+
+<hr/>
+<h1>Удаление проекта</h1>
+<br>
+<form method="post" th:action="@{/removeProject}">
+    <th:p>
+        <label for="projectId">Введите ID проекта : </label>
+        <br/>
+        <input type="text" id="projectId" name="projectId"/> <br/>
+    </th:p>
+    <p>
+        <button type="submit">Удалить проект</button>
+    </p>
+</form>
+
+<hr/>
+<h1>Добавить сотрудника в проект</h1>
+<br>
+<form method="post" th:action="@{/addExecutor}">
+    <th:p>
+        <label for="projectIdFromAddExecutor">Введите ID проекта : </label>
+        <br/>
+        <input type="text" id="projectIdFromAddExecutor" name="projectId"/> <br/>
+    </th:p>
+    <th:p>
+        <label for="workerId">Введите ID сотрудника : </label>
+        <br/>
+        <input type="text" id="workerId" name="workerId"/> <br/>
+    </th:p>
+    <p>
+        <button type="submit">Добавить сотрудника в проект</button>
+    </p>
+</form>
+
+<hr/>
+<h1>Изменить название проекта</h1>
+<br>
+<form method="post" th:action="@{/updateNameProject}">
+    <th:p>
+        <label for="projectIdForChangeNameProject">Введите ID проекта : </label>
+        <br/>
+        <input type="text" id="projectIdForChangeNameProject" name="projectId"/> <br/>
+    </th:p>
+    <th:p>
+        <label for="newNameProject">Введите новое название проекта : </label>
+        <br/>
+        <input type="text" id="newNameProject" name="newNameProject"/> <br/>
+    </th:p>
+    <p>
+        <button type="submit">Изменить название проекта</button>
+    </p>
+</form>
+
+<hr/>
+<h1>Удаление сотрудника из проекта</h1>
+<br>
+<form method="post" th:action="@{/removeWorkerFromProject}">
+    <th:p>
+        <label for="projectIdForRemoveWorker">Введите ID проекта : </label>
+        <br/>
+        <input type="text" id="projectIdForRemoveWorker" name="projectId"/> <br/>
+    </th:p>
+
+    <th:p>
+        <label for="workerIdForDelete">Введите ID сотрудника : </label>
+        <br/>
+        <input type="text" id="workerIdForDelete" name="workerId"/> <br/>
+    </th:p>
+    <p>
+        <button type="submit">Удалить сотрудника из проекта</button>
+    </p>
+</form>
+
+<br/>
+<form th:action="@{/admin}" method="post">
+    <button type="submit">Вернуться к запросам</button>
+</form>
+<br/>
+<hr>
+<form th:action="@{/logout}" method="POST">
+    <button type="submit">Logout</button>
+</form>
+<br>
+</body>
+</html>

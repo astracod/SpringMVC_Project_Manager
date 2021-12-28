@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     private final ProjectService projectService;
-   // private final MainController mainController;
 
     @GetMapping(value = "/registration")
     public String getSaveWorker(@RequestParam(name = "error", required = false) Boolean error, Model model) {
@@ -53,8 +52,13 @@ public class AuthenticationController {
         return "adminPages/adminShowObject";
     }
 
-    @PostMapping("/adminWorkObject")
-    public String getAdminObjectPage(){
-        return "adminPages/adminWorkOnObjects";
+    @PostMapping("/adminWorkProject")
+    public String getAdminProjectPage(){
+        return "adminPages/functionalWork/adminWorkOnProject";
+    }
+
+    @PostMapping("/adminWorkTask")
+    public String getAdminTaskPage(){
+        return "adminPages/functionalWork/adminWorkOnTask";
     }
 }

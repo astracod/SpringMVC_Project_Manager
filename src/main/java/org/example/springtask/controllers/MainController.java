@@ -34,7 +34,7 @@ public class MainController {
     public String getAllWorkers(Model model) {
         List<WorkerDto> listW = projectService.showAllUsers();
         model.addAttribute("listW", listW);
-        return "adminPages/allWorkers";
+        return "adminPages/viewShowAll/allWorkers";
     }
 
     /**
@@ -80,6 +80,16 @@ public class MainController {
         return "userPages/infoProjectById";
     }
 
+    /**
+     *  используется в Authentication Controller при регитсрации пользователя
+     *  из ProjectService
+     *  здесь оставлен как пример метода для работы через Postman
+     * @param firstName
+     * @param lastName
+     * @param login
+     * @param password
+     * @return
+     */
     @PutMapping("saveWorker")
     public Status saveWorker(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String login, @RequestParam String password) {
         return projectService.saveWorker(firstName, lastName, login, password);
@@ -95,7 +105,7 @@ public class MainController {
     public String getAllProjects(Model model) {
         List<OnlyProjectInfoDto> listP = projectService.showAllProjects();
         model.addAttribute("listP", listP);
-        return "adminPages/allProjects";
+        return "adminPages/viewShowAll/allProjects";
     }
 
 
@@ -109,29 +119,45 @@ public class MainController {
     public String changeProject(@RequestParam(value = "nameProject") String nameProject, Model model) {
         Status status = projectService.createProject(nameProject);
         model.addAttribute("status", status.getStatus());
-        return "adminPages/adminWorkOnObjects";
+        return "adminPages/functionalWork/adminWorkOnProject";
     }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("removeProject")
-    public String removeProject(@RequestParam(value = "projectId")Integer projectId, Model model) {
+    public String removeProject(@RequestParam(value = "projectId") Integer projectId, Model model) {
         Status status = projectService.removeProject(projectId);
         model.addAttribute("status", status.getStatus());
-        return "adminPages/adminWorkOnObjects";
+        return "adminPages/functionalWork/adminWorkOnProject";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("addExecutor")
-    public Status addProjectExecutor(Integer projectId, Integer workerId) {
-        return projectService.addProjectExecutor(projectId, workerId);
+    public String addProjectExecutor(@RequestParam(value = "projectId") Integer projectId,
+                                     @RequestParam(value = "workerId") Integer workerId,
+                                     Model model) {
+        Status status = projectService.addProjectExecutor(projectId, workerId);
+        model.addAttribute("status", status.getStatus());
+        return "adminPages/functionalWork/adminWorkOnProject";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("updateNameProject")
-    public Status changeProjectName(Integer projectId, String newNameProject) {
-        return projectService.changeProjectName(projectId, newNameProject);
+    public String changeProjectName(@RequestParam("projectId") Integer projectId,
+                                    @RequestParam("newNameProject") String newNameProject,
+                                    Model model) {
+        Status status = projectService.changeProjectName(projectId, newNameProject);
+        model.addAttribute("status", status.getStatus());
+        return "adminPages/functionalWork/adminWorkOnProject";
     }
 
-    @DeleteMapping("removeWorkerFromProject")
-    public Status removeWorkerFromProject(Integer projectId, Integer workerId) {
-        return projectService.removeWorkerFromProject(projectId, workerId);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("removeWorkerFromProject")
+    public String removeWorkerFromProject(@RequestParam("projectId") Integer projectId,
+                                          @RequestParam("workerId") Integer workerId,
+                                          Model model) {
+        Status status = projectService.removeWorkerFromProject(projectId, workerId);
+        model.addAttribute("status",status.getStatus());
+        return "adminPages/functionalWork/adminWorkOnProject";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -139,7 +165,7 @@ public class MainController {
     public String getAllTasks(Model model) {
         List<TaskDto> tasks = projectService.getAllTasks();
         model.addAttribute("tasks", tasks);
-        return "adminPages/allTasks";
+        return "adminPages/viewShowAll/allTasks";
     }
 
     @PostMapping("showTask")
@@ -147,9 +173,14 @@ public class MainController {
         return projectService.getTask(taskId);
     }
 
-    @PutMapping("createTask")
-    public Status createTask(String taskName, Integer projectId) {
-        return projectService.createTask(taskName, projectId);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("createTask")
+    public String createTask(@RequestParam(value = "taskName") String taskName,
+                             @RequestParam(value = "projectId") Integer projectId,
+                             Model model) {
+        Status status = projectService.createTask(taskName, projectId);
+        model.addAttribute("status",status.getStatus());
+        return "adminPages/functionalWork/adminWorkOnTask";
     }
 
     @DeleteMapping("removeTask")
