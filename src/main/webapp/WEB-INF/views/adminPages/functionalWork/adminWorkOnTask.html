@@ -1,0 +1,50 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<head>
+    <title>Работа над объектами</title>
+</head>
+<body>
+<h1>Работа над задачей</h1>
+
+<div>
+    <h1>Ответ системы : </h1>
+    <p th:text="${status}"></p>
+</div>
+<hr/>
+<br>
+<h1>Создать задачу</h1>
+<form th:action="@{/createTask}" method="post">
+    <p>
+        <label for="createTaskName">Введите название задачи</label>
+        <br>
+        <input type="text" id="createTaskName" name="taskName">
+    </p>
+    <p>
+        <label for="createTaskID">Введите Id проекта</label>
+        <br>
+        <input type="text" id="createTaskID" name="projectId">
+    </p>
+    <p>
+        <button type="submit">Создать задачу</button>
+    </p>
+</form>
+<hr/>
+<br/>
+<form th:action="@{/admin}" method="post">
+    <button type="submit">Вернуться к запросам</button>
+</form>
+<br/>
+<hr>
+<form th:action="@{/logout}" method="POST">
+    <button type="submit">Logout</button>
+</form>
+<br>
+</body>
+</html>
