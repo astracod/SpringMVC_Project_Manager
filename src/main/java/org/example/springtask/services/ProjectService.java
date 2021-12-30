@@ -3,6 +3,7 @@ package org.example.springtask.services;
 import lombok.extern.slf4j.Slf4j;
 import org.example.springtask.dto.*;
 import org.example.springtask.entity.Project;
+import org.example.springtask.entity.Task;
 import org.example.springtask.entity.Worker;
 import org.example.springtask.mapping.ProjectMapping;
 import org.example.springtask.repository.ProjectDAO;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service(value = "projectService")
@@ -37,18 +40,29 @@ public class ProjectService {
     }
 
     public Status saveWorker(String firstName, String lastName, String login, String password) {
+
         Status status = new Status();
-        if (firstName == null || lastName == null || login == null || password == null){
+        if (firstName == null || lastName == null || login == null || password == null) {
             status.setStatus("Заполните все требуемые поля данных пользователя при регистрации.");
-        }else {
+        } else {
             String codPassword = passwordEncoder.encode(password);
             status = projectDao.createWorker(firstName, lastName, login, codPassword);
         }
-        return  status;
+        return status;
     }
 
     public Status removeWorker(Integer workerId) {
-        return projectDao.removeWorker(workerId);
+        List<Task> tasks = projectDao.returnSheetTask(workerId);
+        Set<Status> statuses = new HashSet<>();
+        tasks.forEach(task -> {
+            statuses.add(projectDao.removeExecutorFromTask(task.getId(), workerId));
+        });
+        statuses.add(projectDao.removeWorker(workerId));
+        Status status = new Status();
+        statuses.forEach(status1 -> {
+            status.setStatus(status1 + " ; ");
+        });
+        return status;
     }
 
     /**

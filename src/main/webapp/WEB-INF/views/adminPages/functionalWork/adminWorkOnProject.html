@@ -103,15 +103,26 @@
     </p>
 </form>
 
+<hr/>
+<h1>Удаление сотрудника из системы</h1>
+<br>
+<form method="post" th:action="@{/removeWorker}">
+
+    <th:p>
+        <label for="removeWorkerFomSystem">Введите ID сотрудника : </label>
+        <br/>
+        <input type="text" id="removeWorkerFomSystem" name="workerId"/> <br/>
+    </th:p>
+    <p>
+        <button type="submit">Удалить сотрудника из системы</button>
+    </p>
+</form>
 <br/>
 <form th:action="@{/admin}" method="post">
     <button type="submit">Вернуться к запросам</button>
 </form>
 <br/>
 <hr>
-<form th:action="@{/logout}" method="POST">
-    <button type="submit">Logout</button>
-</form>
-<br>
+
 </body>
 </html>

@@ -7,6 +7,7 @@
 <h1>Аутентификация</h1>
 
 <form th:action="@{/login}" method="post">
+
     <div th:if="${param.error}">
         <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
     </div>
@@ -14,29 +15,27 @@
     <div th:if="${param.logout}">
         <p class="text-warning">You have been logged out.</p>
     </div>
-    <th:p>
+    <p>
         <label for="username">Username</label>:
         <input type="text" id="username" name="username" autofocus="autofocus"/> <br/>
-    </th:p>
-    <br>
-    <th:p>
+    </p>
+    <p>
         <label for="password">Password</label>:
         <input type="password" id="password" name="password"/> <br/>
-    </th:p>
-    <br>
-    <th:p>
-        <input type="submit" value="Log in"/>
-    </th:p>
+    </p>
+    <p>
+        <button type="submit">Войти</button>
+    </p>
 </form>
+
 <br/>
 <hr>
-<form method="LINK" th:action="@{/registration}">
-    <th:p>
-        <input type="submit" value="Зарегистрироваться">
-    </th:p>
 
+<form th:action="@{/registration}" method="get">
+    <button type="submit">РЕГИСТРАЦИЯ</button>
 </form>
 
-
+<br/>
+<hr/>
 </body>
 </html>

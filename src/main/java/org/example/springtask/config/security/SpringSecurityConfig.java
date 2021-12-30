@@ -29,12 +29,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public SpringSecurityConfig(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
-//.hasRole("USER")
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/registration").permitAll()
                 .antMatchers("/login").permitAll()
                 .anyRequest()
                 .authenticated()

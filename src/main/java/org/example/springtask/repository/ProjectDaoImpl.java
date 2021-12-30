@@ -4,6 +4,7 @@ package org.example.springtask.repository;
 import lombok.extern.slf4j.Slf4j;
 import org.example.springtask.dto.Status;
 import org.example.springtask.entity.Project;
+import org.example.springtask.entity.Role;
 import org.example.springtask.entity.Task;
 import org.example.springtask.entity.Worker;
 import org.example.springtask.exception.RequestProcessingException;
@@ -49,12 +50,12 @@ public class ProjectDaoImpl implements ProjectDAO {
     @Override
     public Worker getWorkerByEmail(String email) {
         EntityManager em = entityManagerFactory.createEntityManager();
-        Worker worker ;
+        Worker worker;
         try {
             worker = em.createQuery("select w from Worker w where w.login = :email", Worker.class)
                     .setParameter("email", email)
                     .getSingleResult();
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new UsernameNotFoundException(" Внимание!!! Пользователя с таким логином нет в базе данных.");
         }
         em.close();
@@ -77,11 +78,13 @@ public class ProjectDaoImpl implements ProjectDAO {
     @Override
     public Worker getAllInfoByWorkerId(Integer workerId) {
         EntityManager em = entityManagerFactory.createEntityManager();
+        Worker worker ;
         em.getTransaction().begin();
-        Worker worker = em.createQuery("select w from Worker w left join fetch w.projects wp where w.id = :workerId", Worker.class)
-                .setParameter("workerId", workerId)
-                .getSingleResult();
-        if (worker == null) {
+        try{
+            worker = em.createQuery("select w from Worker w left join fetch w.projects wp where w.id = :workerId", Worker.class)
+                    .setParameter("workerId", workerId)
+                    .getSingleResult();
+        }catch (Exception e){
             throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
         }
         em.getTransaction().commit();
@@ -98,6 +101,7 @@ public class ProjectDaoImpl implements ProjectDAO {
         w.setLastName(lastName);
         w.setLogin(login);
         w.setPassword(codPassword);
+        w.setRole(Role.USER);
         em.persist(w);
         em.getTransaction().commit();
         em.close();
@@ -115,10 +119,14 @@ public class ProjectDaoImpl implements ProjectDAO {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         Worker worker = em.find(Worker.class, workerId);
+
+
         if (worker == null) {
             throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
         }
+        worker.getProjects().forEach(worker::removeProject);
         em.remove(worker);
+
         em.getTransaction().commit();
         em.close();
         return getStatus(" Исполнитель удален из базы данных.");
@@ -211,7 +219,7 @@ public class ProjectDaoImpl implements ProjectDAO {
 
     @Override
     public Status createProject(String nameProject) {
-        if (nameProject.isEmpty()){
+        if (nameProject.isEmpty()) {
             return getStatus("Задайте название проекту.");
         }
         EntityManager em = entityManagerFactory.createEntityManager();
@@ -333,6 +341,25 @@ public class ProjectDaoImpl implements ProjectDAO {
     }
 
 
+    public List<Task> returnSheetTask(Integer workerId) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        Worker worker = em.find(Worker.class, workerId);
+        if (worker == null) {
+            throw new RequestProcessingException(" Внимание!!! Сотрудника с таким ID нет в базе данных");
+        }
+        List<Task> task = em.createQuery("select t from Task t where t.userId =:workerId")
+                .setParameter("workerId", workerId)
+                .getResultList();
+
+        em.getTransaction().commit();
+        em.close();
+
+        return task;
+    }
+
+
     @Override
     public Status removeWorkerFromProject(Integer projectId, Integer workerId) {
         EntityManager em = entityManagerFactory.createEntityManager();
@@ -356,7 +383,8 @@ public class ProjectDaoImpl implements ProjectDAO {
     }
 
     /**
-     *  Методы работы с классом Task
+     * Методы работы с классом Task
+     *
      * @return
      */
     @Override

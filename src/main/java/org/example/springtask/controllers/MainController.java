@@ -81,9 +81,10 @@ public class MainController {
     }
 
     /**
-     *  используется в Authentication Controller при регитсрации пользователя
-     *  из ProjectService
-     *  здесь оставлен как пример метода для работы через Postman
+     * используется в Authentication Controller при регитсрации пользователя
+     * из ProjectService
+     * здесь оставлен как пример метода для работы через Postman
+     *
      * @param firstName
      * @param lastName
      * @param login
@@ -95,9 +96,12 @@ public class MainController {
         return projectService.saveWorker(firstName, lastName, login, password);
     }
 
-    @DeleteMapping("removeWorker")
-    public Status removeWorker(@RequestParam Integer workerId) {
-        return projectService.removeWorker(workerId);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("removeWorker")
+    public String removeWorker(@RequestParam(value = "workerId" ) Integer workerId, Model model) {
+        Status status = projectService.removeWorker(workerId);
+        model.addAttribute("status", status.getStatus());
+        return "adminPages/functionalWork/adminWorkOnProject";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -156,7 +160,7 @@ public class MainController {
                                           @RequestParam("workerId") Integer workerId,
                                           Model model) {
         Status status = projectService.removeWorkerFromProject(projectId, workerId);
-        model.addAttribute("status",status.getStatus());
+        model.addAttribute("status", status.getStatus());
         return "adminPages/functionalWork/adminWorkOnProject";
     }
 
@@ -179,23 +183,36 @@ public class MainController {
                              @RequestParam(value = "projectId") Integer projectId,
                              Model model) {
         Status status = projectService.createTask(taskName, projectId);
-        model.addAttribute("status",status.getStatus());
+        model.addAttribute("status", status.getStatus());
         return "adminPages/functionalWork/adminWorkOnTask";
     }
 
-    @DeleteMapping("removeTask")
-    public Status removeTask(Integer taskId) {
-        return projectService.removeTask(taskId);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("removeTask")
+    public String removeTask(@RequestParam(value = "taskId") Integer taskId, Model model) {
+        Status status = projectService.removeTask(taskId);
+        model.addAttribute("status", status.getStatus());
+        return "adminPages/functionalWork/adminWorkOnTask";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("assignExecutor")
-    public Status assignAnExecutorToTask(Integer taskId, Integer workerId) {
-        return projectService.assignAnExecutorToTask(taskId, workerId);
+    public String assignAnExecutorToTask(@RequestParam(value = "taskId") Integer taskId,
+                                         @RequestParam(value = "workerId") Integer workerId,
+                                         Model model) {
+        Status status = projectService.assignAnExecutorToTask(taskId, workerId);
+        model.addAttribute("status", status.getStatus());
+        return "adminPages/functionalWork/adminWorkOnTask";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("removeExecutor")
-    public Status removeExecutorFromTask(Integer taskId, Integer workerId) {
-        return projectService.removeExecutorFromTask(taskId, workerId);
+    public String removeExecutorFromTask(@RequestParam(value = "taskId") Integer taskId,
+                                         @RequestParam(value = "workerId") Integer workerId,
+                                         Model model) {
+        Status status = projectService.removeExecutorFromTask(taskId, workerId);
+        model.addAttribute("status", status.getStatus());
+        return "adminPages/functionalWork/adminWorkOnTask";
     }
 }
 

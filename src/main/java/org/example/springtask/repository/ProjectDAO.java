@@ -53,4 +53,5 @@ public interface ProjectDAO {
 
     Status removeTask(Integer taskId);
 
+    List<Task> returnSheetTask(Integer workerId);
 }

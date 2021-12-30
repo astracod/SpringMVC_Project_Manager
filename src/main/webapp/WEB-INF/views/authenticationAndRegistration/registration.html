@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login page</title>
+    <title>Регистрация</title>
 </head>
 <body>
 <h1>Регистрация</h1>
@@ -11,24 +11,31 @@
         <div th:if="${param.error}">
             <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
         </div>
-
-        <label for="firstName">Username</label>:
-        <input type="text" id="firstName" name="firstName" autofocus="autofocus"/> <br/>
-
-        <label for="lastName">Username</label>:
-        <input type="text" id="lastName" name="lastName" autofocus="autofocus"/> <br/>
-
-
-        <label for="username">Username</label>:
-        <input type="text" id="username" name="username" autofocus="autofocus"/> <br/>
-
-        <label for="password">Password</label>:
-        <input type="password" id="password" name="password"/> <br/>
-
-        <input type="submit" value="Log in"/>
+        <p>
+            <label for="firstName">Имя сотрудника</label><br/>
+            <input type="text" id="firstName" name="firstName" autofocus="autofocus"/><br/>
+        </p>
+        <p>
+            <label for="lastName">Фамилия сотрудника</label><br/>
+            <input type="text" id="lastName" name="lastName" autofocus="autofocus"/><br/>
+        </p>
+        <p>
+            <label for="username">Логин сотрудника</label><br/>
+            <input type="email" id="username" name="username" autofocus="autofocus"/><br/>
+        </p>
+        <p>
+            <label for="password">Password</label><br/>
+            <input type="password" id="password" name="password"/><br/>
+        </p>
+        <p>
+            <button type="submit">Зарегистрироваться</button>
+        </p>
     </div>
 </form>
 
-
+<form th:action="@{/backLogin}" method="get">
+    <button type="submit">Назад</button>
+</form>
+<br>
 </body>
 </html>
