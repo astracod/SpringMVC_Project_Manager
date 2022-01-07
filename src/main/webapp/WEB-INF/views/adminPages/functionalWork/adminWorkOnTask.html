@@ -22,6 +22,11 @@
 <h1>Создать задачу</h1>
 <form th:action="@{/createTask}" method="post">
     <p>
+        <label for="createTaskText">Введите текст задачи</label>
+        <br>
+        <textarea name="textTask" id="createTaskText"></textarea>
+    </p>
+    <p>
         <label for="createTaskName">Введите название задачи</label>
         <br>
         <input type="text" id="createTaskName" name="taskName">

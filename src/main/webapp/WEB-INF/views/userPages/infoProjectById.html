@@ -34,7 +34,9 @@
         <th:label>| Название задачи :</th:label>
         <td th:text="${item.getTaskName()}"></td>
         <th:label>| Дата создания задачи :</th:label>
-        <td th:text="${item.getDateCreateTask()}"></td>
+        <td th:text="${item.getDateCreateTask()}"></td><br/>
+        <th:label>| Текст задачи :</th:label>
+        <td th:text="${item.getTextTask()}"></td><br/>
         <th:label>| ID ответственного :</th:label>
         <td th:text="${item.getUserId()}"></td>
         </p>

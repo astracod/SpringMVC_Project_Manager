@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -32,7 +33,21 @@ public class Task {
     private Integer userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
     private Project project;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id) &&
+                Objects.equals(taskName, task.taskName) &&
+                Objects.equals(dateCreateTask, task.dateCreateTask) &&
+                Objects.equals(userId, task.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, taskName, dateCreateTask, userId);
+    }
 }

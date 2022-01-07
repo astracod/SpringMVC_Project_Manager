@@ -29,6 +29,8 @@
     </tr>
     <br/>
     <tr th:each="project : ${infoAboutUser.getWorker().getProjects()}">
+        <th:label>ID проекта :</th:label>
+        <td th:text="${project.getId()}"></td>
         <th:label>| Название проекта :</th:label>
         <td th:text="${project.getProjectName()}"></td>
     </tr>

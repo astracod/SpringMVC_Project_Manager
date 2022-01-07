@@ -25,7 +25,6 @@ public class Project {
     @Column(name = "project_name")
     private String projectName;
 
-    //(mappedBy = "projects")
     @ManyToMany(
             cascade = {
                     CascadeType.PERSIST,
@@ -38,8 +37,8 @@ public class Project {
     private Set<Worker> workers = new HashSet<>();
 
 
-    @OneToMany
-    @JoinColumn(name = "id")
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "project_id")
     private Set<Task> tasks = new HashSet<>();
 
     public void addTask(Task task) {
@@ -48,8 +47,8 @@ public class Project {
     }
 
     public void removeTask(Task task){
-        this.tasks.remove(task);
-        task.setProject(this);
+        tasks.remove(task);
+        task.setProject(null);
     }
 
     public void addWorker(Worker worker) {

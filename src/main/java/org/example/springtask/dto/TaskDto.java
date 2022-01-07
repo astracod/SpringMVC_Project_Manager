@@ -14,4 +14,6 @@ public class TaskDto {
     private Integer projectId;
 
     private Integer userId;
+
+    private String textTask;
 }

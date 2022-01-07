@@ -63,7 +63,7 @@ public class MainController {
         model.addAttribute("infoAboutUser", fullWorkerDto);
         return "userPages/userInfoByWorkerId";
     }
-
+// иметь 2 проета с задачами , где эти задачи объеденены одним сотрудником
 
     /**
      * получить всю информацию о проекте по его ID (задачи, сотрудники)
@@ -98,7 +98,7 @@ public class MainController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("removeWorker")
-    public String removeWorker(@RequestParam(value = "workerId" ) Integer workerId, Model model) {
+    public String removeWorker(@RequestParam(value = "workerId") Integer workerId, Model model) {
         Status status = projectService.removeWorker(workerId);
         model.addAttribute("status", status.getStatus());
         return "adminPages/functionalWork/adminWorkOnProject";
@@ -181,8 +181,9 @@ public class MainController {
     @PostMapping("createTask")
     public String createTask(@RequestParam(value = "taskName") String taskName,
                              @RequestParam(value = "projectId") Integer projectId,
+                             @RequestParam(value = "textTask") String textTask,
                              Model model) {
-        Status status = projectService.createTask(taskName, projectId);
+        Status status = projectService.createTask(textTask, taskName, projectId);
         model.addAttribute("status", status.getStatus());
         return "adminPages/functionalWork/adminWorkOnTask";
     }

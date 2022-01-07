@@ -31,6 +31,8 @@ public interface ProjectDAO {
 
     Project getProject(Integer projectId);
 
+    Project getProjectForDeleteTask(Integer projectId);
+
     Status createProject(String nameProject);
 
     Status removeProject(Integer projectId);
@@ -49,9 +51,20 @@ public interface ProjectDAO {
 
     Task getTask(Integer taskId);
 
+    Integer getTaskByName(String taskName);
+
     Status createTask(String taskName, LocalDateTime dateCreateTask, Integer project);
+
+    Status refreshTask(Integer Id, String taskName, LocalDateTime dateCreateTask, Integer project);
 
     Status removeTask(Integer taskId);
 
     List<Task> returnSheetTask(Integer workerId);
+
+    Status createFile(Integer taskId, String pathToFile);
+
+    Status deleteFile(Integer taskId);
+
+    Status getFilePath(Integer id);
+
 }

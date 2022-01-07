@@ -10,6 +10,8 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 @Setter
 @Getter
@@ -17,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity(name = "Worker")
 @Table(name = "users")
-public class Worker  {
+public class Worker {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +40,10 @@ public class Worker  {
    /* @JoinTable(name = "user_project",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "project_id")}
+HashSet<>()
     )*/
     @JsonIgnore
-    private Set<Project> projects = new HashSet<>();
+    private Set<Project> projects = new ConcurrentSkipListSet<>();
 
     public void addProject(Project project) {
         this.projects.add(project);
