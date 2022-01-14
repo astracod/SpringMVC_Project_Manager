@@ -13,10 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Repository(value = "projectDaoImpl")
@@ -399,7 +396,6 @@ public class ProjectDaoImpl implements ProjectDAO {
 
         Project project = em.find(Project.class, projectId);
 
-        log.info("DAO метод удаление работника из проекта ID: {}", project.getId());
         if (project == null) {
             return getStatus("Проекта с заданными условиями нет в базе");
         }
