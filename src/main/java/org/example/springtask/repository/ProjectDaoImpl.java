@@ -185,11 +185,11 @@ public class ProjectDaoImpl implements ProjectDAO {
      * @param workerId
      * @return
      */
-    public List getAllProjectTasksByWorkerId(Integer workerId) {
+    public List<Task> getAllProjectTasksByWorkerId(Integer workerId) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
-        List tasks = em.createQuery("select t from Task t left join fetch t.project  where t.userId = :workerId", Task.class)
+        List<Task> tasks = em.createQuery("select t from Task t left join fetch t.project  where t.userId = :workerId", Task.class)
                 .setParameter("workerId", workerId)
                 .getResultList();
 
