@@ -10,14 +10,11 @@
         <createTable tableName="user_project">
             <column name="user_id" type="BIGINT">
                 <constraints foreignKeyName="user_user_project_fk" referencedTableName="users"
-                             referencedColumnNames="id" nullable="false"/>
+                             referencedColumnNames="id" primaryKey="true" nullable="false"/>
             </column>
             <column name="project_id" type="BIGINT">
                 <constraints foreignKeyName="project_user_project_fk" referencedTableName="projects"
-                             referencedColumnNames="id" nullable="false"/>
-            </column>
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false" referencedColumnNames="project_id,user_id"/>
+                             referencedColumnNames="id" primaryKey="true" nullable="false"/>
             </column>
         </createTable>
     </changeSet>
