@@ -75,15 +75,12 @@ public class ProjectDaoImpl implements ProjectDAO {
     @Override
     public Worker getAllInfoByWorkerId(Integer workerId) {
         EntityManager em = entityManagerFactory.createEntityManager();
-        Worker worker;
         em.getTransaction().begin();
-        try {
-            worker = em.createQuery("select w from Worker w left join fetch w.projects wp where w.id = :workerId", Worker.class)
-                    .setParameter("workerId", workerId)
-                    .getSingleResult();
-        } catch (Exception e) {
-            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
-        }
+
+        Worker worker = em.createQuery("select w from Worker w left join fetch w.projects wp where w.id = :workerId", Worker.class)
+                .setParameter("workerId", workerId)
+                .getSingleResult();
+
         em.getTransaction().commit();
         em.close();
         return worker;
@@ -162,14 +159,10 @@ public class ProjectDaoImpl implements ProjectDAO {
 
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Project project = new Project();
-        try {
-            project = em.createQuery("select p from Project p left join fetch p.workers pw where p.id =:projectId", Project.class)
-                    .setParameter("projectId", projectId)
-                    .getSingleResult();
-        } catch (Exception e) {
-            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Проекта с таким ID исполнителя нет в базе данных");
-        }
+
+        Project project = em.createQuery("select p from Project p left join fetch p.workers pw where p.id =:projectId", Project.class)
+                .setParameter("projectId", projectId)
+                .getSingleResult();
 
 
         em.getTransaction().commit();
@@ -367,7 +360,7 @@ public class ProjectDaoImpl implements ProjectDAO {
         em.getTransaction().commit();
         em.close();
 
-        return getStatus(" Исполнитель удален из задачи");
+        return getStatus(" Исполнитель удален из задачи.");
     }
 
 

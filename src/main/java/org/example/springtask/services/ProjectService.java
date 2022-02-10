@@ -5,6 +5,7 @@ import org.example.springtask.dto.*;
 import org.example.springtask.entity.Project;
 import org.example.springtask.entity.Task;
 import org.example.springtask.entity.Worker;
+import org.example.springtask.exception.RequestProcessingException;
 import org.example.springtask.mapping.ProjectMapping;
 import org.example.springtask.repository.FileRepository;
 import org.example.springtask.repository.ProjectDAO;
@@ -13,7 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -24,14 +27,26 @@ public class ProjectService {
     private FileRepository fileRepository;
     private ProjectMapping mapping;
     private PasswordEncoder passwordEncoder;
+    private Clock clock;
 
     @Autowired
+    public ProjectService(ProjectDAO projectDao, FileRepository fileRepository, ProjectMapping mapping, PasswordEncoder passwordEncoder, Clock clock) {
+        this.projectDao = projectDao;
+        this.fileRepository = fileRepository;
+        this.mapping = mapping;
+        this.passwordEncoder = passwordEncoder;
+        this.clock = clock;
+    }
+
+/*    @Autowired
     public ProjectService(ProjectDAO projectDao, FileRepository fileRepository, ProjectMapping mapping, PasswordEncoder passwordEncoder) {
         this.projectDao = projectDao;
         this.fileRepository = fileRepository;
         this.mapping = mapping;
         this.passwordEncoder = passwordEncoder;
-    }
+
+    }*/
+
 
     public List<WorkerDto> showAllUsers() {
         List workers = projectDao.allWorkers();
@@ -66,10 +81,10 @@ public class ProjectService {
         Status status = new Status();
         StringBuilder answer = new StringBuilder();
         statuses.forEach(status1 -> {
-                    answer.append(status1).append(" ; ");
+                    answer.append(status1).append('\u0020');
                 }
-
         );
+        status.setStatus(answer.toString());
 
         return status;
     }
@@ -141,50 +156,52 @@ public class ProjectService {
 
 
     public List getAllTasks() {
-        return mapping.toDtoList(projectDao.getAllTasks());
+        return mapping.toTaskDtoList(projectDao.getAllTasks());
     }
 
     public TaskDto getTask(Integer taskId) {
-        return mapping.toTask(projectDao.getTask(taskId));
+        return mapping.toTaskDto(projectDao.getTask(taskId));
     }
 
     @Transactional
     public Status createTask(String text, String taskName, Integer projectId) {
-        Status statusRefresh;
-        Status statusCreate;
-        Status createFile = null;
         Status statusTheEnd = new Status();
-        String statusTask;
-        String path = "";
-        Integer taskId;
-        LocalDateTime dateTime = LocalDateTime.now();
 
-        Status statusRemote = fileRepository.giveTask(dateTime, text, taskName);
+        LocalDateTime dateTime = LocalDateTime.now(clock);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String textTime = dateTime.format(formatter);
+        LocalDateTime parsedDate = LocalDateTime.parse(textTime, formatter);
 
-        taskId = projectDao.getTaskByName(taskName);
+        String answerDate = parsedDate.toString().substring(0, parsedDate.toString().indexOf("T"))
+                .concat(" ")
+                .concat(parsedDate.toString().substring(11, 19));
+
+        Integer taskId = projectDao.getTaskByName(taskName);
 
         if (taskId > 0) {
-            statusRefresh = projectDao.refreshTask(taskId, taskName, dateTime, projectId);
-            statusTask = statusRefresh.getStatus();
+            statusTheEnd.setStatus(refreshTaskInRemoteRepositoryAndDB(taskName, text, projectId, taskId, dateTime, answerDate));
         } else {
-            statusCreate = projectDao.createTask(taskName, dateTime, projectId);
-            statusTask = statusCreate.getStatus();
-            taskId = projectDao.getTaskByName(taskName);
-            Optional<String> addressTask = statusRemote.getAuxiliaryField().values().stream().findFirst();
-            if (addressTask.isPresent()) {
-                path = addressTask.get();
-            }
-            createFile = projectDao.createFile(taskId, path);
-        }
-
-        String answerDate = dateTime.toString().substring(0, dateTime.toString().indexOf("."));
-
-        if (createFile != null) {
-            statusTheEnd.setStatus(statusRemote.getStatus() + "\n" + statusTask + "\n" + createFile.getStatus() + answerDate);
-        } else {
-            statusTheEnd.setStatus("Данные задачи обновленны : " + answerDate);
+            statusTheEnd.setStatus(createTaskInRemoteRepositoryAndDB(text, taskName, projectId, dateTime, answerDate));
         }
         return statusTheEnd;
+    }
+
+    private String refreshTaskInRemoteRepositoryAndDB(String taskName, String text, Integer projectId, Integer taskId, LocalDateTime dateTime, String answerDate) {
+        Status statusRefresh = projectDao.refreshTask(taskId, taskName, dateTime, projectId);
+        fileRepository.giveTask(dateTime, text, taskName);
+        String statusTask = statusRefresh.getStatus();
+        return statusTask + " : " + answerDate;
+    }
+
+    private String createTaskInRemoteRepositoryAndDB(String text, String taskName, Integer projectId, LocalDateTime dateTime, String answerDate) {
+        Status statusCreate = projectDao.createTask(taskName, dateTime, projectId);
+        String statusTask = statusCreate.getStatus();
+        Status statusRemote = fileRepository.giveTask(dateTime, text, taskName);
+        String path = statusRemote.getAuxiliaryField().values().stream().findFirst().get();
+        Integer taskIdForCreateFile = projectDao.getTaskByName(taskName);
+
+        Status createFile = projectDao.createFile(taskIdForCreateFile, path);
+        return statusRemote.getStatus() + " ; " + statusTask + " ; " + createFile.getStatus() + " : " + answerDate;
     }
 
     public Status removeTask(Integer taskId) {
@@ -211,23 +228,33 @@ public class ProjectService {
         return projectDao.removeExecutorFromTask(taskId, workerId);
     }
 
+
     @Transactional(readOnly = true)
     public ProjectDto getAllExecutorProjectsByProjectId(Integer projectId) {
-        Project project = projectDao.getAllInfoByProjectId(projectId);
-        ProjectDto projectDto = mapping.toProject(project);
-        projectDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByProjectId(projectId)));
-        projectDto.getTasks().forEach(
-                taskDto -> taskDto.setTextTask(fileRepository.getFileTaskByFileId(projectDao.getFilePath(taskDto.getId()).getStatus()))
-        );
+        ProjectDto projectDto;
+        try {
+            projectDto = mapping.toProject(projectDao.getAllInfoByProjectId(projectId));
+            projectDto.setTasks(mapping.toTaskDtoList(projectDao.getAllProjectTasksByProjectId(projectId)));
+            projectDto.getTasks().forEach(
+                    taskDto -> taskDto.setTextTask(fileRepository.getFileTaskByFileId(projectDao.getFilePath(taskDto.getId()).getStatus()))
+            );
+        } catch (Exception e) {
+            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Проекта с таким ID исполнителя нет в базе данных", e);
+        }
         return projectDto;
     }
 
     @Transactional(readOnly = true)
     public FullWorkerDto getAllInfoByWorkerId(Integer workerId) {
         FullWorkerDto workerDto = new FullWorkerDto();
-        Worker worker = projectDao.getAllInfoByWorkerId(workerId);
-        workerDto.setWorker(mapping.toFullWorker(worker));
-        workerDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByWorkerId(workerId)));
+
+        try {
+            workerDto.setWorker(mapping.toFullWorker(projectDao.getAllInfoByWorkerId(workerId)));
+            workerDto.setTasks(mapping.toTaskDtoList(projectDao.getAllProjectTasksByWorkerId(workerId)));
+        } catch (Exception e) {
+            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных", e);
+        }
+
         return workerDto;
     }
 }

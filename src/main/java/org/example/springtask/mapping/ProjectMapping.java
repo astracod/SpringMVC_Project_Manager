@@ -88,7 +88,7 @@ public class ProjectMapping {
         return projectDtoList;
     }
 
-    public TaskDto toTask(Task task) {
+    public TaskDto toTaskDto(Task task) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         TaskDto taskDto = new TaskDto();
         taskDto.setId(task.getId());
@@ -101,10 +101,10 @@ public class ProjectMapping {
         return taskDto;
     }
 
-    public List<TaskDto> toDtoList(List<Task> tasks) {
+    public List<TaskDto> toTaskDtoList(List<Task> tasks) {
         List<TaskDto> taskDtoList = new ArrayList<>();
         for (Task task : tasks) {
-            taskDtoList.add(toTask(task));
+            taskDtoList.add(toTaskDto(task));
         }
         return taskDtoList;
     }
