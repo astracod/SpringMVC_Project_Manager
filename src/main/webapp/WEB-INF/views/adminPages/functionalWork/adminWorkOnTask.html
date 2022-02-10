@@ -8,88 +8,88 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 <head>
-    <title>Работа над объектами</title>
+    <title th:utext="#{functional.task.title}"></title>
 </head>
 <body>
-<h1>Работа над задачей</h1>
+<h1 th:utext="#{functional.task.header}"></h1>
 
 <div>
-    <h1>Ответ системы : </h1>
+    <h1 th:utext="#{functional.task.answer}"></h1>
     <p th:text="${status}"></p>
 </div>
 <hr/>
 <br>
-<h1>Создать задачу</h1>
+<h1 th:utext="#{functional.task.header.create}"></h1>
 <form th:action="@{/createTask}" method="post">
     <p>
-        <label for="createTaskText">Введите текст задачи</label>
+        <label for="createTaskText" th:utext="#{task.create}"></label>
         <br>
         <textarea name="textTask" id="createTaskText"></textarea>
     </p>
     <p>
-        <label for="createTaskName">Введите название задачи</label>
+        <label for="createTaskName" th:utext="#{task.create.name}"></label>
         <br>
         <input type="text" id="createTaskName" name="taskName">
     </p>
     <p>
-        <label for="createTaskID">Введите Id проекта</label>
+        <label for="createTaskID" th:utext="#{task.create.id}"></label>
         <br>
         <input type="text" id="createTaskID" name="projectId">
     </p>
     <p>
-        <button type="submit">Создать задачу</button>
+        <button type="submit" th:utext="#{task.create.button}"></button>
     </p>
 </form>
 <br>
-<h1>Удалить задачу</h1>
+<h1 th:utext="#{functional.task.header.delete}"></h1>
 <form th:action="@{/removeTask}" method="post">
     <p>
-        <label for="removeTaskID">Введите Id задачи</label>
+        <label for="removeTaskID" th:utext="#{task.delete.id}"></label>
         <br>
         <input type="text" id="removeTaskID" name="taskId">
     </p>
     <p>
-        <button type="submit">Удалить задачу</button>
+        <button type="submit" th:utext="#{task.delete.button}"></button>
     </p>
 </form>
 <br>
-<h1>Назначить исполнителя задаче</h1>
+<h1 th:utext="#{functional.task.add.executor.header}"></h1>
 <form th:action="@{/assignExecutor}" method="post">
     <p>
-        <label for="assignTaskId">Введите ID задачи</label>
+        <label for="assignTaskId" th:utext="#{task.delete.id}"></label>
         <br>
         <input type="text" id="assignTaskId" name="taskId">
     </p>
     <p>
-        <label for="assignWorkerID">Введите Id сотрудника</label>
+        <label for="assignWorkerID" th:utext="#{task.add.executor.id}"></label>
         <br>
         <input type="text" id="assignWorkerID" name="workerId">
     </p>
     <p>
-        <button type="submit">Назначить исполнителя задаче</button>
+        <button type="submit" th:utext="#{task.add.executor.button}"></button>
     </p>
 </form>
 <br>
-<h1>Отстранить исполнителя от реализации задачи</h1>
+<h1 th:utext="#{functional.task.suspend.executor.header}"></h1>
 <form th:action="@{/removeExecutor}" method="post">
     <p>
-        <label for="removeExecutorTaskId">Введите ID задачи</label>
+        <label for="removeExecutorTaskId" th:utext="#{task.delete.id}"></label>
         <br>
         <input type="text" id="removeExecutorTaskId" name="taskId">
     </p>
     <p>
-        <label for="removeExecutorTaskIdWorkerID">Введите Id сотрудника</label>
+        <label for="removeExecutorTaskIdWorkerID" th:utext="#{task.add.executor.id}"></label>
         <br>
         <input type="text" id="removeExecutorTaskIdWorkerID" name="workerId">
     </p>
     <p>
-        <button type="submit">Отстранить исполнителя</button>
+        <button type="submit" th:utext="#{task.suspend.button}"></button>
     </p>
 </form>
 <hr/>
 <br/>
 <form th:action="@{/admin}" method="post">
-    <button type="submit">Вернуться к запросам</button>
+    <button type="submit" th:utext="#{functional.button.back}"></button>
 </form>
 <br/>
 <hr>

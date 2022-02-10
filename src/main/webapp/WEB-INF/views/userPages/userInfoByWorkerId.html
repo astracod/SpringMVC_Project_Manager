@@ -8,42 +8,42 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 <head>
-    <title>Информация о сотруднике</title>
+    <title th:utext="#{title.about.worker}"></title>
 </head>
 <body>
-<h1>Сотрудник задействован в : </h1>
+<h1 th:utext="#{header.about.worker}"></h1>
 <hr>
 <div>
 
 
     <tr>
         <p>
-            <th:label>ID сотрудника :</th:label>
+            <label th:utext="#{worker.id}"></label>
         <td th:text="${infoAboutUser.getWorker().id}"></td>
 
-        <th:label>| Имя сотрудника :</th:label>
+        <label th:utext="#{worker.username}"></label>
         <td th:text="${infoAboutUser.getWorker().firstName}"></td>
-        <th:label>| Фамилия сотрудника :</th:label>
+        <label th:utext="#{worker.username.second.name}"></label>
         <td th:text="${infoAboutUser.getWorker().lastName}"></td>
         </p>
     </tr>
     <br/>
     <tr th:each="project : ${infoAboutUser.getWorker().getProjects()}">
-        <th:label>ID проекта :</th:label>
+        <label th:utext="#{project.id}"></label>
         <td th:text="${project.getId()}"></td>
-        <th:label>| Название проекта :</th:label>
+        <label th:utext="#{project.name}"></label>
         <td th:text="${project.getProjectName()}"></td>
     </tr>
     <br/>
     <tr th:each="worker : ${infoAboutUser.getTasks()}">
         <p>
-            <th:label>ID задачи :</th:label>
+            <label th:utext="#{task.id}"></label>
         <td th:text="${worker.id}"></td>
 
-        <th:label>| Дата создания задачи :</th:label>
+        <label th:utext="#{task.date}"></label>
         <td th:text="${worker.getDateCreateTask()}"></td>
 
-        <th:label>| Название задачи :</th:label>
+        <label th:utext="#{task.name}"></label>
         <td th:text="${worker.getTaskName()}"></td>
         </p>
     </tr>
@@ -51,7 +51,7 @@
     <br/>
     <hr>
     <form th:action="@{/user}" method="POST">
-        <button type="submit">Перейти на главную страницу</button>
+        <button type="submit" th:utext="#{button.main.page}"></button>
     </form>
 
 
