@@ -50,15 +50,15 @@ public class ProjectMapping {
         return workerDto;
     }
 
-    private ProjectInfoForWorkerDto toProjectInfoForWorkerDto(Project projects) {
-        ProjectInfoForWorkerDto piw = new ProjectInfoForWorkerDto();
+    private OnlyProjectInfoDto toProjectInfoForWorkerDto(Project projects) {
+        OnlyProjectInfoDto piw = new OnlyProjectInfoDto();
         piw.setId(projects.getId());
         piw.setProjectName(projects.getProjectName());
         return piw;
     }
 
-    public List<ProjectInfoForWorkerDto> toProjectsInfoForWorkerDto(List<Project> projects) {
-        List<ProjectInfoForWorkerDto> projectDtoList = new ArrayList<>();
+    public List<OnlyProjectInfoDto> toProjectsInfoForWorkerDto(List<Project> projects) {
+        List<OnlyProjectInfoDto> projectDtoList = new ArrayList<>();
         for (Project project : projects) {
             projectDtoList.add(toProjectInfoForWorkerDto(project));
         }
