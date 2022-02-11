@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.LocaleResolver;
@@ -32,6 +31,7 @@ import java.util.Locale;
 @PropertySource(value = "classpath:hibernate/db.properties")
 public class SpringConfig implements WebMvcConfigurer {
 
+    public static final int COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 10;
     private MappingJackson2HttpMessageConverter jackson2HttpMessageConverter;
 
 
@@ -53,7 +53,7 @@ public class SpringConfig implements WebMvcConfigurer {
         CookieLocaleResolver resolver = new CookieLocaleResolver();
         resolver.setDefaultLocale(new Locale("ru"));
         resolver.setCookieName("locale");
-        resolver.setCookieMaxAge(60 * 60 * 24 * 365 * 10);
+        resolver.setCookieMaxAge(COOKIE_MAX_AGE);
         return resolver;
     }
 
