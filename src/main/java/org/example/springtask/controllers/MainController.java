@@ -63,7 +63,6 @@ public class MainController {
         model.addAttribute("infoAboutUser", fullWorkerDto);
         return "userPages/userInfoByWorkerId";
     }
-// иметь 2 проета с задачами , где эти задачи объеденены одним сотрудником
 
     /**
      * получить всю информацию о проекте по его ID (задачи, сотрудники)

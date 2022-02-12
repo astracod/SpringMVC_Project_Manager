@@ -467,7 +467,7 @@ public class ProjectDaoImpl implements ProjectDAO {
     public Integer getTaskByName(String taskName) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Integer task = null;
+        Integer task ;
         try {
             task = em.createQuery("select t from Task t where t.taskName =:taskName", Task.class)
                     .setParameter("taskName", taskName)
@@ -475,7 +475,6 @@ public class ProjectDaoImpl implements ProjectDAO {
         } catch (Exception e) {
             task = -1;
         }
-
 
         em.getTransaction().commit();
         em.close();
