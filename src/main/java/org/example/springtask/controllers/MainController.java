@@ -23,7 +23,7 @@ public class MainController {
     @GetMapping("/")
     public String sortByRole(Authentication auth) {
         String myRole = auth.getAuthorities().stream().findFirst().get().toString();
-        if (myRole.equals("ADMIN")) {
+        if ("ADMIN".equals(myRole)) {
             return "adminPages/adminShowObject";
         }
         return "userPages/user";
@@ -63,6 +63,7 @@ public class MainController {
         model.addAttribute("infoAboutUser", fullWorkerDto);
         return "userPages/userInfoByWorkerId";
     }
+
 
     /**
      * получить всю информацию о проекте по его ID (задачи, сотрудники)
