@@ -9,7 +9,7 @@
 <div>
     <tr th:each="item : ${project.getWorkersId()}">
         <p>
-        <label th:utext="#{worker.id}"></label>
+            <label th:utext="#{worker.id}"></label>
         <td th:text="${item.id}"></td>
         <label th:utext="#{worker.username}"></label>
         <td th:text="${item.firstName}"></td>
@@ -20,7 +20,7 @@
     <br>
     <tr>
         <p>
-        <label th:utext="#{project.id}"></label>
+            <label th:utext="#{project.id}"></label>
         <td th:text="${project.getId()}"></td>
         <label th:utext="#{project.name}"></label>
         <td th:text="${project.getProjectName()}"></td>
@@ -29,21 +29,21 @@
     <br>
     <tr th:each="item : ${project.getTasks()}">
         <p>
-        <label th:utext="#{task.id}"></label>
+            <label th:utext="#{task.id}"></label>
         <td th:text="${item.getId()}"></td>
         <label th:utext="#{task.name}"></label>
         <td th:text="${item.getTaskName()}"></td>
         <label th:utext="#{task.date}"></label>
-        <td th:text="${item.getDateCreateTask()}"></td><br/>
+        <td th:text="${item.getDateCreateTask()}"></td>
+        <br/>
         <label th:utext="#{task.text}"></label>
-        <td th:text="${item.getTextTask()}"></td><br/>
+        <td th:text="${item.getTextTask()}"></td>
+        <br/>
         <label th:utext="#{worker.id}"></label>
         <td th:text="${item.getUserId()}"></td>
         </p>
     </tr>
-
 </div>
-
 <br/>
 <hr>
 <form th:action="@{/user}" method="POST">

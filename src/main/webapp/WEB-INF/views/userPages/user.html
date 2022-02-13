@@ -13,7 +13,6 @@
 <body>
 <h1 th:utext="#{title.admin.header}"></h1>
 <div>
-
     <form th:action="@{/showWorkerById}" th:method="post">
 
         <div th:if="${param.error}">
@@ -35,7 +34,6 @@
     <br/>
     <hr>
     <form th:action="@{/getById}" th:method="post">
-
         <div th:if="${param.error}">
             <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
         </div>
@@ -56,9 +54,6 @@
     <form th:action="@{/logout}" method="POST">
         <button type="submit" th:utext="#{button.logout}"></button>
     </form>
-
-
 </div>
-
 </body>
 </html>
