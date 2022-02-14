@@ -14,9 +14,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Repository(value = "projectDaoImpl")
@@ -111,14 +109,6 @@ public class ProjectDaoImpl implements ProjectDAO {
     private Status getStatus(String text) {
         Status status = new Status();
         status.setStatus(text);
-        return status;
-    }
-    private Status getStatus(String text, Integer integer) {
-        Map<String,String> stringStringMap = new HashMap<>();
-        stringStringMap.put("integer", String.valueOf(integer));
-        Status status = new Status();
-        status.setStatus(text);
-        status.setAuxiliaryField(stringStringMap);
         return status;
     }
 
