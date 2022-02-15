@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.springtask.dto.Status;
 import org.example.springtask.entity.*;
 import org.example.springtask.exception.RequestProcessingException;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
@@ -13,10 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Repository(value = "projectDaoImpl")
@@ -66,25 +64,11 @@ public class ProjectDaoImpl implements ProjectDAO {
     public Worker getWorker(Integer workerId) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Worker worker = em.find(Worker.class, workerId);
-        if (worker == null) {
-            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
-        }
-        em.getTransaction().commit();
-        em.close();
-        return worker;
-    }
 
-    @Override
-    public Worker getAllInfoByWorkerId(Integer workerId) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        Worker worker;
-        em.getTransaction().begin();
-        try {
-            worker = em.createQuery("select w from Worker w left join fetch w.projects wp where w.id = :workerId", Worker.class)
-                    .setParameter("workerId", workerId)
-                    .getSingleResult();
-        } catch (Exception e) {
+        Worker worker = em.createQuery("select w from Worker w left join fetch w.projects where w.id =:workerId", Worker.class)
+                .setParameter("workerId", workerId)
+                .getSingleResult();
+        if (worker == null) {
             throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
         }
         em.getTransaction().commit();
@@ -108,13 +92,14 @@ public class ProjectDaoImpl implements ProjectDAO {
         return getStatus(" Исполнитель добавлен в базу данных.");
     }
 
-    private Status getStatus(String text) {
+    public Status getStatus(String text) {
         Status status = new Status();
         status.setStatus(text);
         return status;
     }
+
     private Status getStatus(String text, Integer integer) {
-        Map<String,String> stringStringMap = new HashMap<>();
+        Map<String, String> stringStringMap = new HashMap<>();
         stringStringMap.put("integer", String.valueOf(integer));
         Status status = new Status();
         status.setStatus(text);
@@ -123,20 +108,17 @@ public class ProjectDaoImpl implements ProjectDAO {
     }
 
     @Override
-    public Status removeWorker(Integer workerId) {
+    public Status removeWorker(Worker worker) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Worker worker = em.find(Worker.class, workerId);
 
-        if (worker == null) {
-            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
-        }
+        em.unwrap(Session.class).update(worker);
 
-        List<Project> projects = new ArrayList<>(worker.getProjects());
-
-        for (Project project : projects) {
+        for (Project project : worker.getProjects()) {
+            em.unwrap(Session.class).update(project);
             worker.removeProject(project);
         }
+
         em.remove(worker);
         em.getTransaction().commit();
         em.close();
@@ -219,7 +201,9 @@ public class ProjectDaoImpl implements ProjectDAO {
     public Project getProject(Integer projectId) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
+
         Project project = em.find(Project.class, projectId);
+
         if (project == null) {
             throw new RequestProcessingException(" ВНИМАНИЕ!!!  Проекта с таким ID нет в базе данных");
         }
@@ -260,13 +244,11 @@ public class ProjectDaoImpl implements ProjectDAO {
     }
 
     @Override
-    public Status removeProject(Integer projectId) {
+    public Status removeProject(Project project) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Project project = em.find(Project.class, projectId);
-        if (project == null) {
-            return getStatus(" Проекта с таким ID нет в базе данных.");
-        }
+        em.unwrap(Session.class).update(project);
+
         List<Task> tasks = new ArrayList<>(project.getTasks());
         for (Task task : tasks) {
             project.removeTask(task);
@@ -278,15 +260,12 @@ public class ProjectDaoImpl implements ProjectDAO {
         return getStatus("Проект удален из базы данных.");
     }
 
-
     @Override
-    public Status changeProjectName(Integer projectId, String newNameProject) {
+    public Status changeProjectName(Project project, String newNameProject) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Project project = em.find(Project.class, projectId);
-        if (project == null) {
-            return getStatus(" Проекта с таким ID нет в базе данных.");
-        }
+
+        em.unwrap(Session.class).update(project);
         project.setProjectName(newNameProject);
         em.persist(project);
         em.getTransaction().commit();
@@ -294,35 +273,22 @@ public class ProjectDaoImpl implements ProjectDAO {
         return getStatus("Имя проекта успешно заменено");
     }
 
+    //  работа оконченна здесь
     @Override
-    public Status addProjectExecutor(Integer projectId, Integer workerId) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
+    public Status addProjectExecutor(Project project, Worker worker) {
+        EntityManager em1 = entityManagerFactory.createEntityManager();
 
-        /**
-         *  проверка входящего ID проекта на наличие в базе данных
-         */
-        Project project = em.find(Project.class, projectId);
-        if (project == null) {
-            return getStatus(" Проекта с таким ID нет в базе данных.");
-        }
+        em1.getTransaction().begin();
 
-        /**
-         * проверка входящего ID исполнителя на наличие в базе данных
-         */
-        Worker worker = em.find(Worker.class, workerId);
-        if (worker == null) {
-            return getStatus(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
-        }
+        em1.unwrap(Session.class).update(project);
+        em1.unwrap(Session.class).update(worker);
 
-        /**
-         *  Создание нового объекта исполнителя, запись его в объект проекта и передача данных в базу
-         */
         project.addWorker(worker);
-        em.persist(project);
+        em1.persist(project);
 
-        em.getTransaction().commit();
-        em.close();
+        em1.getTransaction().commit();
+
+        em1.close();
         return getStatus(" Данные исполнителя изменены");
     }
 
@@ -350,19 +316,12 @@ public class ProjectDaoImpl implements ProjectDAO {
     }
 
     @Override
-    public Status removeExecutorFromTask(Integer taskId, Integer workerId) {
+    public Status removeExecutorFromTask(Task task, Worker worker) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
-        Worker worker = em.find(Worker.class, workerId);
-        if (worker == null) {
-            return getStatus(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
-        }
-
-        Task task = em.find(Task.class, taskId);
-        if (task == null) {
-            throw new RequestProcessingException(" Внимание!!! Задачи с таким ID нет в базе данных.");
-        }
+        em.unwrap(Session.class).update(task);
+        em.unwrap(Session.class).update(worker);
 
         task.setUserId(null);
         em.persist(task);
@@ -377,10 +336,6 @@ public class ProjectDaoImpl implements ProjectDAO {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
-        Worker worker = em.find(Worker.class, workerId);
-        if (worker == null) {
-            throw new RequestProcessingException(" Внимание!!! Сотрудника с таким ID нет в базе данных");
-        }
         List<Task> task = em.createQuery("select t from Task t where t.userId =:workerId")
                 .setParameter("workerId", workerId)
                 .getResultList();
@@ -391,22 +346,13 @@ public class ProjectDaoImpl implements ProjectDAO {
         return task;
     }
 
-
     @Override
-    public Status removeWorkerFromProject(Integer projectId, Integer workerId) {
+    public Status removeWorkerFromProject(Project project, Worker worker) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
-        Project project = em.find(Project.class, projectId);
-
-        log.info("DAO метод удаление работника из проекта ID: {}", project.getId());
-        if (project == null) {
-            return getStatus("Проекта с заданными условиями нет в базе");
-        }
-        Worker worker = em.find(Worker.class, workerId);
-        if (worker == null) {
-            return getStatus(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
-        }
+        em.unwrap(Session.class).update(project);
+        em.unwrap(Session.class).update(worker);
 
         project.removeWorker(worker);
         em.persist(project);
@@ -486,11 +432,10 @@ public class ProjectDaoImpl implements ProjectDAO {
     }
 
     @Override
-    public Status refreshTask(Integer taskId, String taskName, LocalDateTime dateCreateTask, Integer projectID) {
+    public Status refreshTask(Task task, LocalDateTime dateCreateTask) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-
-        Task task = em.find(Task.class, taskId);
+        em.unwrap(Session.class).update(task);
 
         task.setDateCreateTask(dateCreateTask);
         em.persist(task);
@@ -500,10 +445,10 @@ public class ProjectDaoImpl implements ProjectDAO {
     }
 
     @Override
-    public Status removeTask(Integer taskId) {
+    public Status removeTask(Task task) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Task task = em.find(Task.class, taskId);
+        em.unwrap(Session.class).update(task);
 
         if (task == null) {
             return getStatus("Задачи с таким ID нет в базе данных.");
@@ -511,17 +456,18 @@ public class ProjectDaoImpl implements ProjectDAO {
         em.remove(task);
         em.getTransaction().commit();
         em.close();
-        return getStatus("Задача удалена из базы данных : " + taskId + " .");
+        return getStatus("Задача удалена из базы данных : " + task.getId() + " .");
     }
 
     /**
      * методы работы с File
      */
+
     @Override
-    public Status createFile(Integer taskId, String pathToFile) {
+    public Status createFile(Task task, String pathToFile) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Task task = em.find(Task.class, taskId);
+        em.unwrap(Session.class).update(task);
         File file = new File();
         file.setId(task.getId());
         file.setPathToFile(pathToFile);
@@ -533,12 +479,29 @@ public class ProjectDaoImpl implements ProjectDAO {
     }
 
     @Override
-    public Status deleteFile(Integer taskId) {
+    public File getFile(Integer id) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        File file;
+        try {
+            file = em.createQuery("select f from File f left join fetch f.task where f.id =:id", File.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+        } catch (Exception e) {
+            throw new RequestProcessingException("Файла с таким ID нет в базе данных.");
+        }
+        em.getTransaction().commit();
+        em.close();
+        return file;
+    }
+
+    @Override
+    public Status deleteFile(File file) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         String name;
         try {
-            File file = em.find(File.class, taskId);
+            em.unwrap(Session.class).update(file);
             name = file.getPathToFile();
             em.remove(file);
         } catch (Exception e) {
@@ -549,19 +512,4 @@ public class ProjectDaoImpl implements ProjectDAO {
         return getStatus(name);
     }
 
-    @Override
-    public Status getFilePath(Integer id) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        String name;
-        try {
-            File file = em.find(File.class, id);
-            name = file.getPathToFile();
-        } catch (Exception e) {
-            return getStatus("Файла с таким ID нет в базе данных.");
-        }
-        em.getTransaction().commit();
-        em.close();
-        return getStatus(name);
-    }
 }

@@ -1,22 +1,17 @@
 package org.example.springtask.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Entity(name = "Worker")
 @Table(name = "users")
 public class Worker {
@@ -55,7 +50,7 @@ HashSet<>()
         project.getWorkers().remove(this);
     }
 
-    @Override
+/*    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -69,6 +64,6 @@ HashSet<>()
     @Override
     public int hashCode() {
         return Objects.hash(id, firstName, lastName, projects);
-    }
+    }*/
 
 }

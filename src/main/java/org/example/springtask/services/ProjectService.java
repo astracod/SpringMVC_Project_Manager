@@ -2,6 +2,7 @@ package org.example.springtask.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.springtask.dto.*;
+import org.example.springtask.entity.File;
 import org.example.springtask.entity.Project;
 import org.example.springtask.entity.Task;
 import org.example.springtask.entity.Worker;
@@ -51,17 +52,19 @@ public class ProjectService {
     }
 
     public Status removeWorker(Integer workerId) {
+        Worker worker = projectDao.getWorker(workerId);
+
         List<Task> tasks = projectDao.returnSheetTask(workerId);
 
         Set<String> statuses = new HashSet<>();
 
         if (!tasks.isEmpty()) {
             tasks.forEach(task -> {
-                statuses.add(projectDao.removeExecutorFromTask(task.getId(), workerId).getStatus());
+                statuses.add(projectDao.removeExecutorFromTask(task, worker).getStatus());
             });
         }
 
-        statuses.add(projectDao.removeWorker(workerId).getStatus());
+        statuses.add(projectDao.removeWorker(worker).getStatus());
 
         Status status = new Status();
         StringBuilder answer = new StringBuilder();
@@ -111,14 +114,16 @@ public class ProjectService {
         for (Task task : project.getTasks()) {
             taskId.add(task.getId());
         }
-        Status removeProject = projectDao.removeProject(projectId);
+        Status removeProject = projectDao.removeProject(project);
         Status removeTask = new Status();
         StringBuilder stringBuilder = new StringBuilder();
 
         if (removeProject.getStatus().equals("Проект удален из базы данных.")) {
             for (Integer id : taskId) {
-                stringBuilder.append(projectDao.removeTask(id).getStatus() + "\n");
-                fileRepository.deleteFileTask(projectDao.deleteFile(id).getStatus());
+                Task task = projectDao.getTask(id);
+                File file = projectDao.getFile(id);
+                stringBuilder.append(projectDao.removeTask(task).getStatus() + "\n");
+                fileRepository.deleteFileTask(projectDao.deleteFile(file).getStatus());
             }
         }
 
@@ -127,16 +132,24 @@ public class ProjectService {
         return removeTask;
     }
 
+
     public Status addProjectExecutor(Integer projectId, Integer workerId) {
-        return projectDao.addProjectExecutor(projectId, workerId);
+        Project project = projectDao.getProject(projectId);
+
+        Worker worker = projectDao.getWorker(workerId);
+
+        return projectDao.addProjectExecutor(project, worker);
     }
 
     public Status changeProjectName(Integer projectId, String newNameProject) {
-        return projectDao.changeProjectName(projectId, newNameProject);
+        Project project = projectDao.getProject(projectId);
+        return projectDao.changeProjectName(project, newNameProject);
     }
 
     public Status removeWorkerFromProject(Integer projectId, Integer workerId) {
-        return projectDao.removeWorkerFromProject(projectId, workerId);
+        Project project = projectDao.getProject(projectId);
+        Worker worker = projectDao.getWorker(workerId);
+        return projectDao.removeWorkerFromProject(project, worker);
     }
 
 
@@ -164,7 +177,8 @@ public class ProjectService {
         taskId = projectDao.getTaskByName(taskName);
 
         if (taskId > 0) {
-            statusRefresh = projectDao.refreshTask(taskId, taskName, dateTime, projectId);
+            Task task = projectDao.getTask(taskId);
+            statusRefresh = projectDao.refreshTask(task, dateTime);
             statusTask = statusRefresh.getStatus();
         } else {
             statusCreate = projectDao.createTask(taskName, dateTime, projectId);
@@ -174,7 +188,8 @@ public class ProjectService {
             if (addressTask.isPresent()) {
                 path = addressTask.get();
             }
-            createFile = projectDao.createFile(taskId, path);
+            Task task = projectDao.getTask(taskId);
+            createFile = projectDao.createFile(task, path);
         }
 
         String answerDate = dateTime.toString().substring(0, dateTime.toString().indexOf("."));
@@ -188,9 +203,13 @@ public class ProjectService {
     }
 
     public Status removeTask(Integer taskId) {
+        Task task = projectDao.getTask(taskId);
 
-        Status deleteTask = projectDao.removeTask(taskId);
-        Status deleteFileTask = projectDao.deleteFile(taskId);
+        Status deleteTask = projectDao.removeTask(task);
+
+        File file = projectDao.getFile(taskId);
+
+        Status deleteFileTask = projectDao.deleteFile(file);
 
         boolean deleteRemoteStorage = fileRepository.deleteFileTask(deleteFileTask.getStatus());
 
@@ -208,7 +227,9 @@ public class ProjectService {
     }
 
     public Status removeExecutorFromTask(Integer taskId, Integer workerId) {
-        return projectDao.removeExecutorFromTask(taskId, workerId);
+        Task task = projectDao.getTask(taskId);
+        Worker worker = projectDao.getWorker(workerId);
+        return projectDao.removeExecutorFromTask(task, worker);
     }
 
     @Transactional(readOnly = true)
@@ -226,7 +247,8 @@ public class ProjectService {
             taskList.add(task.getId());
         }
         for (Integer integer : taskList) {
-            taskMap.put(String.valueOf(integer), projectDao.getFilePath(integer).getStatus());
+            File file = projectDao.getFile(integer);
+            taskMap.put(String.valueOf(integer), file.getPathToFile());
         }
         for (Map.Entry<String, String> stringStringEntry : taskMap.entrySet()) {
             if (!stringStringEntry.getValue().equals("Файла с таким ID нет в базе данных.")) {
@@ -252,7 +274,7 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public FullWorkerDto getAllInfoByWorkerId(Integer workerId) {
         FullWorkerDto workerDto = new FullWorkerDto();
-        Worker worker = projectDao.getAllInfoByWorkerId(workerId);
+        Worker worker = projectDao.getWorker(workerId);
         workerDto.setWorker(mapping.toFullWorker(worker));
         workerDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByWorkerId(workerId)));
         return workerDto;

@@ -1,6 +1,7 @@
 package org.example.springtask.repository;
 
 import org.example.springtask.dto.Status;
+import org.example.springtask.entity.File;
 import org.example.springtask.entity.Project;
 import org.example.springtask.entity.Task;
 import org.example.springtask.entity.Worker;
@@ -15,11 +16,9 @@ public interface ProjectDAO {
 
     Worker getWorker(Integer workerId);
 
-    Worker getAllInfoByWorkerId(Integer workerId);
-
     Status createWorker(String firstName, String lastName, String login, String password);
 
-    Status removeWorker(Integer workerId);
+    Status removeWorker(Worker worker);
 
     List allProjects();
 
@@ -35,17 +34,19 @@ public interface ProjectDAO {
 
     Status createProject(String nameProject);
 
-    Status removeProject(Integer projectId);
+    Status removeProject(Project project);
 
-    Status changeProjectName(Integer projectId, String newNameProject);
+    Status changeProjectName(Project project, String newNameProject);
 
-    Status addProjectExecutor(Integer projectId, Integer workerId);
+    Status getStatus(String text);
+
+    Status addProjectExecutor(Project project, Worker worker);
 
     Status assignAnExecutorToTask(Integer taskId, Integer workerId);
 
-    Status removeExecutorFromTask(Integer taskId, Integer workerId);
+    Status removeExecutorFromTask(Task task, Worker worker);
 
-    Status removeWorkerFromProject(Integer projectId, Integer workerId);
+    Status removeWorkerFromProject(Project project, Worker worker);
 
     List<Task> getAllTasks();
 
@@ -55,16 +56,16 @@ public interface ProjectDAO {
 
     Status createTask(String taskName, LocalDateTime dateCreateTask, Integer project);
 
-    Status refreshTask(Integer Id, String taskName, LocalDateTime dateCreateTask, Integer project);
+    Status refreshTask(Task task,  LocalDateTime dateCreateTask);
 
-    Status removeTask(Integer taskId);
+    Status removeTask(Task task);
 
     List<Task> returnSheetTask(Integer workerId);
 
-    Status createFile(Integer taskId, String pathToFile);
+    Status createFile(Task task, String pathToFile);
 
-    Status deleteFile(Integer taskId);
+    File getFile(Integer id);
 
-    Status getFilePath(Integer id);
+    Status deleteFile(File file);
 
 }
