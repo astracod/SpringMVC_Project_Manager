@@ -30,7 +30,7 @@ public class FileRepository {
             uploadDirectory.mkdir();
         }
 
-        String fileName = taskName.replace(" ", "_") + ".txt";
+        String fileName = getNameOfFile(taskName);
         String lastPath = uploadDirectory + "\\" + fileName;
         File checkFile = new File(lastPath);
         if (!checkFile.isFile()) {
@@ -69,6 +69,16 @@ public class FileRepository {
         status.setStatus("Задача сформирована на удаленом ресурсе");
         status.setAuxiliaryField(fileNameFromTask);
         return status;
+    }
+
+    private String getNameOfFile(String taskName) {
+        String[] arr = taskName.trim().split("\\s");
+        StringBuilder answer = new StringBuilder();
+        for (String s : arr) {
+            answer.append(Character.toUpperCase(s.charAt(0))).append(s.substring(1));
+        }
+        answer.append(".txt");
+        return answer.toString();
     }
 
     public boolean deleteFileTask(String name) {
