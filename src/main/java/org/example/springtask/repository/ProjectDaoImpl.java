@@ -98,15 +98,6 @@ public class ProjectDaoImpl implements ProjectDAO {
         return status;
     }
 
-    private Status getStatus(String text, Integer integer) {
-        Map<String, String> stringStringMap = new HashMap<>();
-        stringStringMap.put("integer", String.valueOf(integer));
-        Status status = new Status();
-        status.setStatus(text);
-        status.setAuxiliaryField(stringStringMap);
-        return status;
-    }
-
     @Override
     public Status removeWorker(Worker worker) {
         EntityManager em = entityManagerFactory.createEntityManager();
@@ -118,7 +109,6 @@ public class ProjectDaoImpl implements ProjectDAO {
             em.unwrap(Session.class).update(project);
             worker.removeProject(project);
         }
-
         em.remove(worker);
         em.getTransaction().commit();
         em.close();
@@ -396,7 +386,7 @@ public class ProjectDaoImpl implements ProjectDAO {
     public Integer getTaskByName(String taskName) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Integer task = null;
+        Integer task;
         try {
             task = em.createQuery("select t from Task t where t.taskName =:taskName", Task.class)
                     .setParameter("taskName", taskName)
@@ -461,7 +451,6 @@ public class ProjectDaoImpl implements ProjectDAO {
     /**
      * методы работы с File
      */
-
     @Override
     public Status createFile(Task task, String pathToFile) {
         EntityManager em = entityManagerFactory.createEntityManager();
@@ -510,5 +499,4 @@ public class ProjectDaoImpl implements ProjectDAO {
         em.close();
         return getStatus(name);
     }
-
 }

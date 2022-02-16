@@ -132,7 +132,6 @@ public class ProjectService {
         return removeTask;
     }
 
-
     public Status addProjectExecutor(Integer projectId, Integer workerId) {
         Project project = projectDao.getProject(projectId);
 
@@ -234,39 +233,12 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public ProjectDto getAllExecutorProjectsByProjectId(Integer projectId) {
-
-        List<Integer> taskList = new ArrayList<>();
-        Map<String, String> taskMap = new HashMap<>();
-        Map<String, String> textTask = new HashMap<>();
-        ProjectDto projectDto;
         Project project = projectDao.getAllInfoByProjectId(projectId);
-        projectDto = mapping.toProject(project);
+        ProjectDto projectDto = mapping.toProject(project);
         projectDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByProjectId(projectId)));
-
-        for (TaskDto task : projectDto.getTasks()) {
-            taskList.add(task.getId());
-        }
-        for (Integer integer : taskList) {
-            File file = projectDao.getFile(integer);
-            taskMap.put(String.valueOf(integer), file.getPathToFile());
-        }
-        for (Map.Entry<String, String> stringStringEntry : taskMap.entrySet()) {
-            if (!stringStringEntry.getValue().equals("Файла с таким ID нет в базе данных.")) {
-                log.info("СЕРВИС : {}", stringStringEntry.getKey());
-                textTask.put(stringStringEntry.getKey(),
-                        fileRepository.getFileTaskByFileId(stringStringEntry.getValue()));
-            }
-        }
-        for (Map.Entry<String, String> stringStringEntry : textTask.entrySet()) {
-
-            for (TaskDto task : projectDto.getTasks()) {
-                if (task.getId() == Integer.valueOf(stringStringEntry.getKey())) {
-                    if (stringStringEntry.getValue() != null) {
-                        task.setTextTask(stringStringEntry.getValue());
-                    }
-                }
-            }
-        }
+        projectDto.getTasks().forEach(
+                taskDto -> taskDto.setTextTask(fileRepository.getFileTaskByFileId(projectDao.getFile(taskDto.getId()).getPathToFile()))
+        );
 
         return projectDto;
     }

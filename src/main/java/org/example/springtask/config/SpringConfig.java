@@ -1,20 +1,27 @@
 package org.example.springtask.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
+
+import java.util.Locale;
 
 
 @Configuration
@@ -24,6 +31,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 @PropertySource(value = "classpath:hibernate/db.properties")
 public class SpringConfig implements WebMvcConfigurer {
 
+    public static final int COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 10;
     private MappingJackson2HttpMessageConverter jackson2HttpMessageConverter;
 
 
@@ -39,12 +47,25 @@ public class SpringConfig implements WebMvcConfigurer {
         return jackson2HttpMessageConverter;
     }
 
+
     @Bean
-    public ResourceBundleMessageSource messageSource() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("i18n/messages");
+    public LocaleResolver localeResolver() {
+        CookieLocaleResolver resolver = new CookieLocaleResolver();
+        resolver.setDefaultLocale(new Locale("ru"));
+        resolver.setCookieName("locale");
+        resolver.setCookieMaxAge(COOKIE_MAX_AGE);
+        return resolver;
+    }
+
+    @Bean
+    public MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("classpath:templates/app");
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setFallbackToSystemLocale(true);
         return messageSource;
     }
+
 
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
@@ -62,6 +83,13 @@ public class SpringConfig implements WebMvcConfigurer {
         templateEngine.setTemplateResolver(templateResolver());
         templateEngine.setEnableSpringELCompiler(true);
         return templateEngine;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
+        localeChangeInterceptor.setParamName("lang");
+        registry.addInterceptor(localeChangeInterceptor);
     }
 
     @Override
