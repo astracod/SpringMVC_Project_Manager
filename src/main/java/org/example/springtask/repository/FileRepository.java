@@ -53,7 +53,7 @@ public class FileRepository {
             out.flush();
 
         } catch (Exception e) {
-            status.setStatus("Ошибка передачи задачи в хранилище данных");
+            status.setStatus("Ошибка передачи задачи "+ taskName +" в хранилище данных "+ dateCreateTask);
             return status;
         } finally {
             try {
