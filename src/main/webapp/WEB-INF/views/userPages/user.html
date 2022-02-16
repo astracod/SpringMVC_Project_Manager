@@ -8,12 +8,11 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 <head>
-    <title>Страница пользователя</title>
+    <title th:utext="#{user.title}"></title>
 </head>
 <body>
-<h1>Выберите запрос : </h1>
+<h1 th:utext="#{title.admin.header}"></h1>
 <div>
-
     <form th:action="@{/showWorkerById}" th:method="post">
 
         <div th:if="${param.error}">
@@ -21,44 +20,40 @@
         </div>
 
         <th:p>
-            <label for="id">Введите ID сотрудника : </label>
+            <label for="id" th:utext="#{task.add.executor.id}"></label>
             <input type="id" id="id" name="workerId"/> <br/>
         </th:p>
 
         <br/>
 
         <th:p>
-            <input type="submit" value="Отправить запрос"/>
+            <button type="submit" th:utext="#{button.send.request}"></button>
         </th:p>
         <br/>
     </form>
     <br/>
     <hr>
     <form th:action="@{/getById}" th:method="post">
-
         <div th:if="${param.error}">
             <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
         </div>
 
         <th:p>
-            <label for="projectId">Введите ID проекта : </label>
+            <label for="projectId" th:utext="#{task.create.id}"></label>
             <input type="text" id="projectId" name="projectId"/> <br/>
         </th:p>
 
         <br/>
 
         <th:p>
-            <input type="submit" value="Отправить запрос"/>
+            <button type="submit" th:utext="#{button.send.request}"></button>
         </th:p>
         <br/>
     </form>
     <hr>
     <form th:action="@{/logout}" method="POST">
-        <button type="submit">Logout</button>
+        <button type="submit" th:utext="#{button.logout}"></button>
     </form>
-
-
 </div>
-
 </body>
 </html>
