@@ -8,121 +8,115 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 <head>
-    <title>Работа над объектами</title>
+    <title th:utext="#{functional.task.title}"></title>
 </head>
 <body>
-<h1>Работа над проектом</h1>
+<h1 th:utext="#{functional.project.header}"></h1>
 
 <div>
-    <h1>Ответ системы : </h1>
+    <h1 th:utext="#{functional.task.answer}"></h1>
     <p th:text="${status}"></p>
 </div>
 <hr/>
-<h1>Создание проекта</h1>
+<h1 th:utext="#{functional.project.header.create}"></h1>
 <br>
 <form method="post" th:action="@{/createProject}">
     <th:p>
-        <label for="nameProject">Введите название проекта : </label>
+        <label for="nameProject" th:utext="#{project.create.name}"></label>
         <br/>
         <input type="text" id="nameProject" name="nameProject"/> <br/>
     </th:p>
     <p>
-        <button type="submit">Создать проект</button>
+        <button type="submit" th:utext="#{project.button.create}"></button>
     </p>
 </form>
-
 <hr/>
-<h1>Удаление проекта</h1>
+<h1 th:utext="#{functional.project.header.delete}"></h1>
 <br>
 <form method="post" th:action="@{/removeProject}">
     <th:p>
-        <label for="projectId">Введите ID проекта : </label>
+        <label for="projectId" th:utext="#{task.create.id}"></label>
         <br/>
         <input type="text" id="projectId" name="projectId"/> <br/>
     </th:p>
     <p>
-        <button type="submit">Удалить проект</button>
+        <button type="submit" th:utext="#{project.button.delete}"></button>
     </p>
 </form>
-
 <hr/>
-<h1>Добавить сотрудника в проект</h1>
+<h1 th:utext="#{functional.project.header.add.worker}"></h1>
 <br>
 <form method="post" th:action="@{/addExecutor}">
     <th:p>
-        <label for="projectIdFromAddExecutor">Введите ID проекта : </label>
+        <label for="projectIdFromAddExecutor" th:utext="#{task.create.id}"></label>
         <br/>
         <input type="text" id="projectIdFromAddExecutor" name="projectId"/> <br/>
     </th:p>
     <th:p>
-        <label for="workerId">Введите ID сотрудника : </label>
+        <label for="workerId" th:utext="#{task.add.executor.id}"></label>
         <br/>
         <input type="text" id="workerId" name="workerId"/> <br/>
     </th:p>
     <p>
-        <button type="submit">Добавить сотрудника в проект</button>
+        <button type="submit" th:utext="#{project.button.add.worker}"></button>
     </p>
 </form>
-
 <hr/>
-<h1>Изменить название проекта</h1>
+<h1 th:utext="#{functional.project.header.change.name}"></h1>
 <br>
 <form method="post" th:action="@{/updateNameProject}">
     <th:p>
-        <label for="projectIdForChangeNameProject">Введите ID проекта : </label>
+        <label for="projectIdForChangeNameProject" th:utext="#{task.create.id}"></label>
         <br/>
         <input type="text" id="projectIdForChangeNameProject" name="projectId"/> <br/>
     </th:p>
     <th:p>
-        <label for="newNameProject">Введите новое название проекта : </label>
+        <label for="newNameProject" th:utext="#{project.new.name}"></label>
         <br/>
         <input type="text" id="newNameProject" name="newNameProject"/> <br/>
     </th:p>
     <p>
-        <button type="submit">Изменить название проекта</button>
+        <button type="submit" th:utext="#{project.button.new.name}"></button>
     </p>
 </form>
-
 <hr/>
-<h1>Удаление сотрудника из проекта</h1>
+<h1 th:utext="#{functional.project.header.delete.worker}"></h1>
 <br>
 <form method="post" th:action="@{/removeWorkerFromProject}">
     <th:p>
-        <label for="projectIdForRemoveWorker">Введите ID проекта : </label>
+        <label for="projectIdForRemoveWorker" th:utext="#{task.create.id}"></label>
         <br/>
         <input type="text" id="projectIdForRemoveWorker" name="projectId"/> <br/>
     </th:p>
 
     <th:p>
-        <label for="workerIdForDelete">Введите ID сотрудника : </label>
+        <label for="workerIdForDelete" th:utext="#{task.add.executor.id}"></label>
         <br/>
         <input type="text" id="workerIdForDelete" name="workerId"/> <br/>
     </th:p>
     <p>
-        <button type="submit">Удалить сотрудника из проекта</button>
+        <button type="submit" th:utext="#{project.button.delete.worker}"></button>
     </p>
 </form>
-
 <hr/>
-<h1>Удаление сотрудника из системы</h1>
+<h1 th:utext="#{functional.project.header.complete.delete.worker}"></h1>
 <br>
 <form method="post" th:action="@{/removeWorker}">
 
     <th:p>
-        <label for="removeWorkerFomSystem">Введите ID сотрудника : </label>
+        <label for="removeWorkerFomSystem" th:utext="#{task.add.executor.id}"></label>
         <br/>
         <input type="text" id="removeWorkerFomSystem" name="workerId"/> <br/>
     </th:p>
     <p>
-        <button type="submit">Удалить сотрудника из системы</button>
+        <button type="submit" th:utext="#{project.button.complete.delete.worker}"></button>
     </p>
 </form>
 <br/>
 <form th:action="@{/admin}" method="post">
-    <button type="submit">Вернуться к запросам</button>
+    <button type="submit" th:utext="#{functional.button.back}"></button>
 </form>
 <br/>
 <hr>
-
 </body>
 </html>

@@ -134,15 +134,6 @@ public class ProjectDaoImpl implements ProjectDAO {
         return status;
     }
 
-    private Status getStatus(String text, Integer integer) {
-        Map<String, String> stringStringMap = new HashMap<>();
-        stringStringMap.put("integer", String.valueOf(integer));
-        Status status = new Status();
-        status.setStatus(text);
-        status.setAuxiliaryField(stringStringMap);
-        return status;
-    }
-
     @Override
     public Status removeWorker(Integer workerId) {
         EntityManager em = entityManagerFactory.createEntityManager();

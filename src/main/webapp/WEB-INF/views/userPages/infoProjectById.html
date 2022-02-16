@@ -1,53 +1,53 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Информация о проекте</title>
+    <title th:utext="#{title.about.project}"></title>
 </head>
 <body>
-<h1>Проект : </h1>
+<h1 th:utext="#{title.header}"></h1>
 
 <div>
     <tr th:each="item : ${project.getWorkersId()}">
         <p>
-        <th:label>| ID сотрудника :</th:label>
+            <label th:utext="#{worker.id}"></label>
         <td th:text="${item.id}"></td>
-        <th:label>| Имя сотрудника :</th:label>
+        <label th:utext="#{worker.username}"></label>
         <td th:text="${item.firstName}"></td>
-        <th:label>| Фамилия сотрудника :</th:label>
+        <label th:text="#{worker.username.second.name}"></label>
         <td th:text="${item.lastName}"></td>
         </p>
     </tr>
     <br>
     <tr>
         <p>
-        <th:label>| ID проекта :</th:label>
+            <label th:utext="#{project.id}"></label>
         <td th:text="${project.getId()}"></td>
-        <th:label>| Название проекта :</th:label>
+        <label th:utext="#{project.name}"></label>
         <td th:text="${project.getProjectName()}"></td>
         </p>
     </tr>
     <br>
     <tr th:each="item : ${project.getTasks()}">
         <p>
-        <th:label>| ID задачи :</th:label>
+            <label th:utext="#{task.id}"></label>
         <td th:text="${item.getId()}"></td>
-        <th:label>| Название задачи :</th:label>
+        <label th:utext="#{task.name}"></label>
         <td th:text="${item.getTaskName()}"></td>
-        <th:label>| Дата создания задачи :</th:label>
-        <td th:text="${item.getDateCreateTask()}"></td><br/>
-        <th:label>| Текст задачи :</th:label>
-        <td th:text="${item.getTextTask()}"></td><br/>
-        <th:label>| ID ответственного :</th:label>
+        <label th:utext="#{task.date}"></label>
+        <td th:text="${item.getDateCreateTask()}"></td>
+        <br/>
+        <label th:utext="#{task.text}"></label>
+        <td th:text="${item.getTextTask()}"></td>
+        <br/>
+        <label th:utext="#{worker.id}"></label>
         <td th:text="${item.getUserId()}"></td>
         </p>
     </tr>
-
 </div>
-
 <br/>
 <hr>
 <form th:action="@{/user}" method="POST">
-    <button type="submit">Перейти на главную страницу</button>
+    <button type="submit" th:utext="#{button.main.page}"></button>
 </form>
 </body>
 </html>
