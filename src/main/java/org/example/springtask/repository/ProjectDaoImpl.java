@@ -13,10 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Repository(value = "projectDaoImpl")
@@ -113,8 +110,9 @@ public class ProjectDaoImpl implements ProjectDAO {
         status.setStatus(text);
         return status;
     }
+
     private Status getStatus(String text, Integer integer) {
-        Map<String,String> stringStringMap = new HashMap<>();
+        Map<String, String> stringStringMap = new HashMap<>();
         stringStringMap.put("integer", String.valueOf(integer));
         Status status = new Status();
         status.setStatus(text);
@@ -399,7 +397,6 @@ public class ProjectDaoImpl implements ProjectDAO {
 
         Project project = em.find(Project.class, projectId);
 
-        log.info("DAO метод удаление работника из проекта ID: {}", project.getId());
         if (project == null) {
             return getStatus("Проекта с заданными условиями нет в базе");
         }
@@ -451,7 +448,7 @@ public class ProjectDaoImpl implements ProjectDAO {
     public Integer getTaskByName(String taskName) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        Integer task = null;
+        Integer task;
         try {
             task = em.createQuery("select t from Task t where t.taskName =:taskName", Task.class)
                     .setParameter("taskName", taskName)
@@ -544,6 +541,7 @@ public class ProjectDaoImpl implements ProjectDAO {
         } catch (Exception e) {
             return getStatus("Файла с таким ID нет в базе данных.");
         }
+
         em.getTransaction().commit();
         em.close();
         return getStatus(name);
@@ -553,15 +551,12 @@ public class ProjectDaoImpl implements ProjectDAO {
     public Status getFilePath(Integer id) {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
-        String name;
-        try {
-            File file = em.find(File.class, id);
-            name = file.getPathToFile();
-        } catch (Exception e) {
-            return getStatus("Файла с таким ID нет в базе данных.");
-        }
+
+        String nameFile = Optional.ofNullable(em.find(File.class, id).getPathToFile())
+                .orElse("Файла с таким ID нет в базе данных.");
+
         em.getTransaction().commit();
         em.close();
-        return getStatus(name);
+        return getStatus(nameFile);
     }
 }

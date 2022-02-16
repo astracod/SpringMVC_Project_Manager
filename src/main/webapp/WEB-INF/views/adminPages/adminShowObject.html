@@ -8,34 +8,34 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 <head>
-    <title>Страница администратора</title>
+    <title th:utext="#{title.admin}"></title>
 </head>
 <body>
-<h1>Выберите запрос : </h1>
+<h1 th:utext="#{title.admin.header}"></h1>
 <hr>
 <form method="get" th:action="@{/showProjects}">
-    <button type="submit">Показать все проекты</button>
+    <button type="submit" th:utext="#{show.projects}"></button>
 </form>
 <br/>
 <form method="get" th:action="@{/showWorkers}">
-    <button type="submit">Показать всех сотрудников</button>
+    <button type="submit" th:utext="#{show.workers}"></button>
 </form>
 <br/>
 <form method="get" th:action="@{/showTasks}">
-    <button type="submit">Показать все задачи</button>
+    <button type="submit" th:utext="#{show.tasks}"></button>
 </form>
 <br/>
 <form method="post" th:action="@{/adminWorkProject}">
-    <button type="submit">На страницу работы над проектами</button>
+    <button type="submit" th:utext="#{button.for.projects}"></button>
 </form>
 <br/>
 <form method="post" th:action="@{/adminWorkTask}">
-    <button type="submit">На страницу работы над задачами</button>
+    <button type="submit" th:utext="#{button.for.tasks}"></button>
 </form>
 <br/>
 <hr>
 <form th:action="@{/logout}" method="POST">
-    <button type="submit">Logout</button>
+    <button type="submit" th:utext="#{button.logout}"></button>
 </form>
 </body>
 </html>
