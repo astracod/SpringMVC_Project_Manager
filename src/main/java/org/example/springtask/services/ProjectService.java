@@ -7,7 +7,10 @@ import org.example.springtask.entity.Task;
 import org.example.springtask.entity.Worker;
 import org.example.springtask.mapping.ProjectMapping;
 import org.example.springtask.repository.FileRepository;
-import org.example.springtask.repository.ProjectDAO;
+import org.example.springtask.repository.interfaces.FileDAO;
+import org.example.springtask.repository.interfaces.ProjectDAO;
+import org.example.springtask.repository.interfaces.TaskDAO;
+import org.example.springtask.repository.interfaces.WorkerDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,20 +24,26 @@ import java.util.*;
 public class ProjectService {
 
     private ProjectDAO projectDao;
+    private WorkerDAO workerDao;
+    private TaskDAO taskDao;
+    private FileDAO fileDao;
     private FileRepository fileRepository;
     private ProjectMapping mapping;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public ProjectService(ProjectDAO projectDao, FileRepository fileRepository, ProjectMapping mapping, PasswordEncoder passwordEncoder) {
+    public ProjectService(ProjectDAO projectDao, WorkerDAO workerDao, TaskDAO taskDao, FileDAO fileDao, FileRepository fileRepository, ProjectMapping mapping, PasswordEncoder passwordEncoder) {
         this.projectDao = projectDao;
+        this.workerDao = workerDao;
+        this.taskDao = taskDao;
+        this.fileDao = fileDao;
         this.fileRepository = fileRepository;
         this.mapping = mapping;
         this.passwordEncoder = passwordEncoder;
     }
 
     public List<WorkerDto> showAllUsers() {
-        List workers = projectDao.allWorkers();
+        List workers = workerDao.allWorkers();
         return mapping.toWorkersDto(workers);
     }
 
@@ -45,23 +54,23 @@ public class ProjectService {
             status.setStatus("Заполните все требуемые поля данных пользователя при регистрации.");
         } else {
             String codPassword = passwordEncoder.encode(password);
-            status = projectDao.createWorker(firstName, lastName, login, codPassword);
+            status = workerDao.createWorker(firstName, lastName, login, codPassword);
         }
         return status;
     }
 
     public Status removeWorker(Integer workerId) {
-        List<Task> tasks = projectDao.returnSheetTask(workerId);
+        List<Task> tasks = taskDao.returnSheetTask(workerId);
 
         Set<String> statuses = new HashSet<>();
 
         if (!tasks.isEmpty()) {
             tasks.forEach(task -> {
-                statuses.add(projectDao.removeExecutorFromTask(task.getId(), workerId).getStatus());
+                statuses.add(taskDao.removeExecutorFromTask(task.getId(), workerId).getStatus());
             });
         }
 
-        statuses.add(projectDao.removeWorker(workerId).getStatus());
+        statuses.add(workerDao.removeWorker(workerId).getStatus());
 
         Status status = new Status();
         StringBuilder answer = new StringBuilder();
@@ -82,12 +91,12 @@ public class ProjectService {
      */
     @Transactional(readOnly = true)
     public SecurityWorkerDto getWorkerByEmail(String email) {
-        Worker worker = projectDao.getWorkerByEmail(email);
+        Worker worker = workerDao.getWorkerByEmail(email);
         return mapping.toSecurityWorker(worker);
     }
 
     public WorkerDto getWorker(Integer workerId) {
-        return mapping.toWorker(projectDao.getWorker(workerId));
+        return mapping.toWorker(workerDao.getWorker(workerId));
     }
 
 
@@ -117,8 +126,8 @@ public class ProjectService {
 
         if (removeProject.getStatus().equals("Проект удален из базы данных.")) {
             for (Integer id : taskId) {
-                stringBuilder.append(projectDao.removeTask(id).getStatus() + "\n");
-                fileRepository.deleteFileTask(projectDao.deleteFile(id).getStatus());
+                stringBuilder.append(taskDao.removeTask(id).getStatus() + "\n");
+                fileRepository.deleteFileTask(fileDao.deleteFile(id).getStatus());
             }
         }
 
@@ -141,11 +150,11 @@ public class ProjectService {
 
 
     public List getAllTasks() {
-        return mapping.toDtoList(projectDao.getAllTasks());
+        return mapping.toDtoList(taskDao.getAllTasks());
     }
 
     public TaskDto getTask(Integer taskId) {
-        return mapping.toTask(projectDao.getTask(taskId));
+        return mapping.toTask(taskDao.getTask(taskId));
     }
 
     @Transactional
@@ -161,20 +170,20 @@ public class ProjectService {
 
         Status statusRemote = fileRepository.giveTask(dateTime, text, taskName);
 
-        taskId = projectDao.getTaskByName(taskName);
+        taskId = taskDao.getTaskByName(taskName);
 
         if (taskId > 0) {
-            statusRefresh = projectDao.refreshTask(taskId, taskName, dateTime, projectId);
+            statusRefresh = taskDao.refreshTask(taskId, taskName, dateTime, projectId);
             statusTask = statusRefresh.getStatus();
         } else {
-            statusCreate = projectDao.createTask(taskName, dateTime, projectId);
+            statusCreate = taskDao.createTask(taskName, dateTime, projectId);
             statusTask = statusCreate.getStatus();
-            taskId = projectDao.getTaskByName(taskName);
+            taskId = taskDao.getTaskByName(taskName);
             Optional<String> addressTask = statusRemote.getAuxiliaryField().values().stream().findFirst();
             if (addressTask.isPresent()) {
                 path = addressTask.get();
             }
-            createFile = projectDao.createFile(taskId, path);
+            createFile = fileDao.createFile(taskId, path);
         }
 
         String answerDate = dateTime.toString().substring(0, dateTime.toString().indexOf("."));
@@ -189,8 +198,8 @@ public class ProjectService {
 
     public Status removeTask(Integer taskId) {
 
-        Status deleteTask = projectDao.removeTask(taskId);
-        Status deleteFileTask = projectDao.deleteFile(taskId);
+        Status deleteTask = taskDao.removeTask(taskId);
+        Status deleteFileTask = fileDao.deleteFile(taskId);
 
         boolean deleteRemoteStorage = fileRepository.deleteFileTask(deleteFileTask.getStatus());
 
@@ -204,11 +213,11 @@ public class ProjectService {
     }
 
     public Status assignAnExecutorToTask(Integer taskId, Integer workerId) {
-        return projectDao.assignAnExecutorToTask(taskId, workerId);
+        return taskDao.assignAnExecutorToTask(taskId, workerId);
     }
 
     public Status removeExecutorFromTask(Integer taskId, Integer workerId) {
-        return projectDao.removeExecutorFromTask(taskId, workerId);
+        return taskDao.removeExecutorFromTask(taskId, workerId);
     }
 
     @Transactional(readOnly = true)
@@ -226,7 +235,7 @@ public class ProjectService {
             taskList.add(task.getId());
         }
         for (Integer integer : taskList) {
-            taskMap.put(String.valueOf(integer), projectDao.getFilePath(integer).getStatus());
+            taskMap.put(String.valueOf(integer), fileDao.getFilePath(integer).getStatus());
         }
         for (Map.Entry<String, String> stringStringEntry : taskMap.entrySet()) {
             if (!stringStringEntry.getValue().equals("Файла с таким ID нет в базе данных.")) {
@@ -252,41 +261,9 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public FullWorkerDto getAllInfoByWorkerId(Integer workerId) {
         FullWorkerDto workerDto = new FullWorkerDto();
-        Worker worker = projectDao.getAllInfoByWorkerId(workerId);
+        Worker worker = workerDao.getAllInfoByWorkerId(workerId);
         workerDto.setWorker(mapping.toFullWorker(worker));
         workerDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByWorkerId(workerId)));
         return workerDto;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
