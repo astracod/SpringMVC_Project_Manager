@@ -273,7 +273,6 @@ public class ProjectDaoImpl implements ProjectDAO {
         return getStatus("Имя проекта успешно заменено");
     }
 
-    //  работа оконченна здесь
     @Override
     public Status addProjectExecutor(Project project, Worker worker) {
         EntityManager em1 = entityManagerFactory.createEntityManager();
