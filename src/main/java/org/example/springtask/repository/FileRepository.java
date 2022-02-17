@@ -53,7 +53,7 @@ public class FileRepository {
             out.flush();
 
         } catch (Exception e) {
-            status.setStatus("Ошибка передачи задачи "+ taskName +" в хранилище данных "+ dateCreateTask);
+            status.setStatus("Ошибка передачи задачи " + taskName + " в хранилище данных " + dateCreateTask);
             return status;
         } finally {
             try {
@@ -77,10 +77,10 @@ public class FileRepository {
         Path path = Paths.get(absolutePath);
 
         boolean res = Files.exists(path);
-        if (res){
+        if (res) {
             try {
                 Files.delete(path);
-            } catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -105,28 +105,3 @@ public class FileRepository {
         return stringBuilder.toString();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
