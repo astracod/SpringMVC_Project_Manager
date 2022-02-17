@@ -30,7 +30,7 @@ public class FileRepository {
             uploadDirectory.mkdir();
         }
 
-        String fileName = getNameOfFile(taskName);
+        String fileName = getFileName(taskName);
         String lastPath = uploadDirectory + "\\" + fileName;
         File checkFile = new File(lastPath);
         if (!checkFile.isFile()) {
@@ -71,7 +71,7 @@ public class FileRepository {
         return status;
     }
 
-    private String getNameOfFile(String taskName) {
+    private String getFileName(String taskName) {
         String[] arr = taskName.trim().split("\\s");
         StringBuilder answer = new StringBuilder();
         for (String s : arr) {
@@ -115,28 +115,3 @@ public class FileRepository {
         return stringBuilder.toString();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
