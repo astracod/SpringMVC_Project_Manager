@@ -80,7 +80,7 @@ public class FileRepository {
 
     public boolean deleteFileTask(String name) {
 
-        String absolutePath = REMOTE_REPOSITORY + "\\" + name;
+        String absolutePath = REMOTE_REPOSITORY + DOUBLE_BACKSLASH + name;
         Path path = Paths.get(absolutePath);
 
         boolean res = Files.exists(path);
@@ -95,7 +95,7 @@ public class FileRepository {
     }
 
     public String getFileTaskByFileId(String fileName) {
-        String absolutePath = REMOTE_REPOSITORY + "\\" + fileName;
+        String absolutePath = REMOTE_REPOSITORY + DOUBLE_BACKSLASH + fileName;
         StringBuilder stringBuilder = new StringBuilder();
         String line;
 
@@ -107,32 +107,6 @@ public class FileRepository {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return stringBuilder.toString();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
