@@ -77,10 +77,10 @@ public class FileRepository {
         Path path = Paths.get(absolutePath);
 
         boolean res = Files.exists(path);
-        if (res){
+        if (res) {
             try {
                 Files.delete(path);
-            } catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
