@@ -61,7 +61,7 @@ class ProjectMappingTest {
         expectedResult.setUserId(WORKER_ID);
         expectedResult.setProjectId(null);
 
-        TaskDto result = mapping.toTaskDto(task);
+        TaskDto result = mapping.toTask(task);
 
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -127,7 +127,7 @@ class ProjectMappingTest {
 
         List<TaskDto> expectedTaskDtoList = List.of(taskDto);
 
-        List<TaskDto> result = mapping.toTaskDtoList(List.of(taskForMethod));
+        List<TaskDto> result = mapping.toDtoList(List.of(taskForMethod));
 
         assertThat(result).isEqualTo(expectedTaskDtoList);
     }

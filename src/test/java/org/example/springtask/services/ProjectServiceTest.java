@@ -137,7 +137,7 @@ class ProjectServiceTest {
         TaskDto taskDto = new TaskDto();
 
         when(projectDAO.getAllProjectTasksByWorkerId(WORKER_ID)).thenReturn(List.of(task));
-        when(projectMapping.toTaskDtoList(List.of(task))).thenReturn(List.of(taskDto));
+        when(projectMapping.toDtoList(List.of(task))).thenReturn(List.of(taskDto));
 
         FullWorkerDto expectedResult = new FullWorkerDto();
         expectedResult.setWorker(worker);
@@ -211,7 +211,7 @@ class ProjectServiceTest {
         when(projectMapping.toProject(projectByProjectId)).thenReturn(projectDto);
 
         when(projectDAO.getAllProjectTasksByProjectId(WORKER_ID)).thenReturn(List.of(task));
-        when(projectMapping.toTaskDtoList(List.of(task))).thenReturn(List.of(taskDto));
+        when(projectMapping.toDtoList(List.of(task))).thenReturn(List.of(taskDto));
 
         when(projectDAO.getFilePath(WORKER_ID)).thenReturn(status);
         when(fileRepository.getFileTaskByFileId(status.getStatus())).thenReturn(null);
@@ -443,7 +443,7 @@ class ProjectServiceTest {
 
 
         when(projectDAO.getAllTasks()).thenReturn(tasks);
-        when(projectMapping.toTaskDtoList(tasks)).thenReturn(expected);
+        when(projectMapping.toDtoList(tasks)).thenReturn(expected);
         List result = projectService.getAllTasks();
 
         assertThat(result).isEqualTo(expected);
@@ -465,7 +465,7 @@ class ProjectServiceTest {
         taskDto.setUserId(WORKER_ID);
 
         when(projectDAO.getTask(WORKER_ID)).thenReturn(task);
-        when(projectMapping.toTaskDto(task)).thenReturn(taskDto);
+        when(projectMapping.toTask(task)).thenReturn(taskDto);
 
         TaskDto result = projectService.getTask(WORKER_ID);
 
