@@ -25,6 +25,7 @@ public class FileRepository {
     public static final String UNDERSCORE = "_";
     public static final String DOUBLE_BACKSLASH = "\\";
     public static final String NEL = "\n";
+    public static final String TASK_GET_ERROR = "Ошибка получения задачи с удаленного репозитория";
     public final String REMOTE_REPOSITORY = "C:\\Users\\Admin\\Desktop\\scp";
 
     public Status giveTask(LocalDateTime dateCreateTask, String text, String taskName) {
@@ -60,7 +61,7 @@ public class FileRepository {
             out.flush();
 
         } catch (Exception e) {
-            status.setStatus(ERROR_IN_TRANSFER_OF_INFORMATION_TO_REMOTE_RESOURCE);
+            status.setStatus(ERROR_IN_TRANSFER_OF_INFORMATION_TO_REMOTE_RESOURCE + taskName);
             return status;
         } finally {
             try {
@@ -88,7 +89,7 @@ public class FileRepository {
             try {
                 Files.delete(path);
             } catch (IOException e) {
-                e.printStackTrace();
+                res = false;
             }
         }
         return res;
@@ -106,6 +107,7 @@ public class FileRepository {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            stringBuilder.append(TASK_GET_ERROR);
         }
         return stringBuilder.toString();
     }
