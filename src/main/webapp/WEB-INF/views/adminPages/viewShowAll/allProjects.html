@@ -8,25 +8,25 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 <head>
-    <title>Проекты</title>
+    <title th:utext="#{view.projects.title}"></title>
 </head>
 <body>
-<h1>Показать все проекты : </h1>
+<h1 th:utext="#{view.projects.header}"></h1>
 
 <div>
     <tr th:each="project : ${listP}">
         <p>
-            <th:label>| ID проекта :</th:label>
+            <label th:utext="#{project.id}"></label>
         <td th:text="${project.id}"></td>
         <br/>
-        <th:label>| Название проекта :</th:label>
+        <label th:utext="#{project.name}"></label>
         <td th:text="${project.projectName}"></td>
         </p>
     </tr>
     <hr>
     <br/>
     <form th:action="@{/admin}" method="post">
-        <button type="submit">Вернуться к запросам</button>
+        <button type="submit" th:utext="#{functional.button.back}"></button>
     </form>
 </div>
 </body>

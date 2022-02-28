@@ -8,30 +8,30 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 <head>
-    <title>Сотрудники</title>
+    <title th:utext="#{view.workers.title}"></title>
 </head>
 <body>
-<h1>Показать всех сотрудников : </h1>
+<h1 th:utext="#{view.workers.header}"></h1>
 <div>
     <tr th:each="worker : ${listW}">
         <p>
-            <th:label> Id сотрудника :</th:label>
+            <label th:utext="#{worker.id}"></label>
         <td th:text="${worker.id}"></td>
         <br/>
-        <th:label>| Имя сотрудника :</th:label>
+        <label th:utext="#{worker.username}"></label>
         <td th:text="${worker.firstName}"></td>
         <br/>
-        <th:label>| Фамилия сотрудника :</th:label>
+        <label th:utext="#{worker.username.second.name}"></label>
         <td th:text="${worker.lastName}"></td>
         <br/>
-        <th:label>| Логин сотрудника :</th:label>
+        <label th:utext="#{worker.login}"></label>
         <td th:text="${worker.email}"></td>
         </p>
     </tr>
     <hr>
     <br/>
     <form th:action="@{/admin}" method="post">
-        <button type="submit">Вернуться к запросам</button>
+        <button type="submit" th:utext="#{functional.button.back}"></button>
     </form>
 </div>
 </body>
