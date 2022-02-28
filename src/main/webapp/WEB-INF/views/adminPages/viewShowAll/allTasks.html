@@ -8,34 +8,34 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 <head>
-    <title>Задачи</title>
+    <title th:utext="#{view.tasks.title}"></title>
 </head>
 <body>
-<h1>Показать все все задачи : </h1>
+<h1 th:utext="#{view.tasks.header}"></h1>
 
 <div>
     <tr th:each="task : ${tasks}">
         <p>
-            <th:label>| ID задачи :</th:label>
+            <label th:utext="#{task.id}"></label>
         <td th:text="${task.id}"></td>
         <br/>
-        <th:label>| Название задачи :</th:label>
+        <label th:utext="#{task.name}"></label>
         <td th:text="${task.taskName}"></td>
         <br/>
-        <th:label>| Дата создания :</th:label>
+        <label th:utext="#{task.date}"></label>
         <td th:text="${task.dateCreateTask}"></td>
         <br/>
-        <th:label>| ID сотрудника :</th:label>
+        <label th:utext="#{worker.id}"></label>
         <td th:text="${task.userId}"></td>
         <br/>
-        <th:label>| ID проекта :</th:label>
+        <label th:utext="#{project.id}"></label>
         <td th:text="${task.getProjectId()}"></td>
         </p>
     </tr>
     <hr>
     <br/>
     <form th:action="@{/admin}" method="post">
-        <button type="submit">Вернуться к запросам</button>
+        <button type="submit" th:utext="#{functional.button.back}"></button>
     </form>
 </div>
 </body>

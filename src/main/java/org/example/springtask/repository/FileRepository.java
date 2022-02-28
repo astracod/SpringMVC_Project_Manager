@@ -18,11 +18,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FileRepository {
 
+    public static final String TASK_IS_FORMED_ON_REMOTE_RESOURCE = "Задача сформирована на удаленом ресурсе";
+    public static final String ERROR_IN_TRANSFER_OF_INFORMATION_TO_REMOTE_RESOURCE = "Ошибка передачи задачи в хранилище данных";
+    public static final String FILE_EXTENSION = ".txt";
+    public static final String SPACE = " ";
+    public static final String UNDERSCORE = "_";
+    public static final String DOUBLE_BACKSLASH = "\\";
+    public static final String NEL = "\n";
+    public static final String TASK_GET_ERROR = "Ошибка получения задачи с удаленного репозитория";
     public final String REMOTE_REPOSITORY = "C:\\Users\\Admin\\Desktop\\scp";
 
     public Status giveTask(LocalDateTime dateCreateTask, String text, String taskName) {
 
-        String newText = dateCreateTask + "\n" + text + "\n";
+        String newText = dateCreateTask + NEL + text + NEL;
         byte[] textTask = newText.getBytes();
         Status status = new Status();
         File uploadDirectory = new File(REMOTE_REPOSITORY);
@@ -30,8 +38,8 @@ public class FileRepository {
             uploadDirectory.mkdir();
         }
 
-        String fileName = taskName.replace(" ", "_") + ".txt";
-        String lastPath = uploadDirectory + "\\" + fileName;
+        String fileName = taskName.replace(SPACE, UNDERSCORE) + FILE_EXTENSION;
+        String lastPath = uploadDirectory + DOUBLE_BACKSLASH + fileName;
         File checkFile = new File(lastPath);
         if (!checkFile.isFile()) {
             try {
@@ -53,7 +61,7 @@ public class FileRepository {
             out.flush();
 
         } catch (Exception e) {
-            status.setStatus("Ошибка передачи задачи в хранилище данных");
+            status.setStatus(ERROR_IN_TRANSFER_OF_INFORMATION_TO_REMOTE_RESOURCE + taskName);
             return status;
         } finally {
             try {
@@ -66,14 +74,14 @@ public class FileRepository {
         }
         Map<String, String> fileNameFromTask = new HashMap<>();
         fileNameFromTask.put("fileName", fileName);
-        status.setStatus("Задача сформирована на удаленом ресурсе");
+        status.setStatus(TASK_IS_FORMED_ON_REMOTE_RESOURCE);
         status.setAuxiliaryField(fileNameFromTask);
         return status;
     }
 
     public boolean deleteFileTask(String name) {
 
-        String absolutePath = REMOTE_REPOSITORY + "\\" + name;
+        String absolutePath = REMOTE_REPOSITORY + DOUBLE_BACKSLASH + name;
         Path path = Paths.get(absolutePath);
 
         boolean res = Files.exists(path);
@@ -81,15 +89,14 @@ public class FileRepository {
             try {
                 Files.delete(path);
             } catch (IOException e) {
-                e.printStackTrace();
+                res = false;
             }
         }
-
         return res;
     }
 
     public String getFileTaskByFileId(String fileName) {
-        String absolutePath = REMOTE_REPOSITORY + "\\" + fileName;
+        String absolutePath = REMOTE_REPOSITORY + DOUBLE_BACKSLASH + fileName;
         StringBuilder stringBuilder = new StringBuilder();
         String line;
 
@@ -100,8 +107,8 @@ public class FileRepository {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            stringBuilder.append(TASK_GET_ERROR);
         }
-
         return stringBuilder.toString();
     }
 }

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Регистрация</title>
+    <title th:utext="#{title.registration}"></title>
 </head>
 <body>
-<h1>Регистрация</h1>
+<h1 th:utext="#{title.registration}"></h1>
 
 <form th:action="@{/registration}" method="post">
     <div>
@@ -12,29 +12,29 @@
             <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
         </div>
         <p>
-            <label for="firstName">Имя сотрудника</label><br/>
+            <label for="firstName" th:utext="#{worker.username}"></label><br/>
             <input type="text" id="firstName" name="firstName" autofocus="autofocus"/><br/>
         </p>
         <p>
-            <label for="lastName">Фамилия сотрудника</label><br/>
+            <label for="lastName" th:utext="#{worker.username.second.name}"></label><br/>
             <input type="text" id="lastName" name="lastName" autofocus="autofocus"/><br/>
         </p>
         <p>
-            <label for="username">Логин сотрудника</label><br/>
+            <label for="username" th:utext="#{username}"></label><br/>
             <input type="email" id="username" name="username" autofocus="autofocus"/><br/>
         </p>
         <p>
-            <label for="password">Password</label><br/>
+            <label for="password" th:utext="#{password}"></label><br/>
             <input type="password" id="password" name="password"/><br/>
         </p>
         <p>
-            <button type="submit">Зарегистрироваться</button>
+            <button type="submit" th:utext="#{sign.up}"></button>
         </p>
     </div>
 </form>
 
 <form th:action="@{/backLogin}" method="get">
-    <button type="submit">Назад</button>
+    <button type="submit" th:utext="#{back}"></button>
 </form>
 <br>
 </body>
