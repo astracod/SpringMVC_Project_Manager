@@ -22,28 +22,16 @@ import java.util.List;
 public class ProjectDaoImpl implements ProjectDAO {
 
 
-    public static final String NO_USER_WITH_THIS_LOGIN = " Внимание!!! Пользователя с таким логином нет в базе данных.";
     public static final String NO_USER_WITH_THIS_ID = " ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных";
-    public static final String WORKER_ADDED_TO_THE_DB = " Исполнитель добавлен в базу данных.";
-    public static final String WORKER_REMOVED_FROM_THE_DB = " Исполнитель удален из базы данных.";
     public static final String NO_PROJECT_WITH_THIS_ID = " ВНИМАНИЕ!!!  Проекта с таким ID нет в базе данных";
     public static final String GIVE_NAME_THE_PROJECT = "Задайте название проекту.";
     public static final String PROJECT_CREATE = " Проект создан.";
     public static final String PROJECT_REMOVED = "Проект удален из базы данных.";
     public static final String SUCCESSFUL_CHANGE_THE_NAME_OF_PROJECT = "Имя проекта успешно заменено";
     public static final String WORKER_DATA_SUCCESSFULLY_CHANGED = " Данные исполнителя изменены";
-    public static final String NO_TASK_WITH_THIS_ID = " Внимание!!! Задачи с таким ID нет в базе данных.";
-    public static final String WORKER_ASSIGNED_TO_TASK = " Исполнитель присвоен задаче";
-    public static final String WORKER_REMOVED_FROM_TASK = " Исполнитель удален из задачи.";
     public static final String THE_PROJECT_WITH_THE_SPECIFIED_CONDITIONS_IS_NOT_IN_THE_DATABASE = "Проекта с заданными условиями нет в базе";
     public static final String WORKER_REMOVED_FROM_PROJECT = "Исполнитель удален из проекта.";
-    public static final String DB_DOESNT_HAVE_TASKS = " Внимание!!! В базе данных нет задач.";
-    public static final String TASK_CREATE = "Задача создана в базе данных.";
-    public static final String TASK_TEXT_IS_UPDATED_IN_REMOTE_STORAGE = "Текст задачи обновлен в удаленном хранилище.";
-    public static final String TASK_REMOVED_FROM_DB = "Задача удалена из базы данных : ";
-    public static final String SYMBOL_POINT = " .";
-    public static final String FILE_PATH_STORED = "Путь к файлу записан в Базу Данных";
-    public static final String NO_FILE_WITH_THIS_ID = "Файла с таким ID нет в базе данных.";
+
 
     private EntityManagerFactory entityManagerFactory;
 
@@ -232,25 +220,6 @@ public class ProjectDaoImpl implements ProjectDAO {
         em.close();
         return getStatus(WORKER_DATA_SUCCESSFULLY_CHANGED);
     }
-
-/*    public List<Task> returnSheetTask(Integer workerId) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        Worker worker = em.find(Worker.class, workerId);
-        if (worker == null) {
-            throw new RequestProcessingException(NO_USER_WITH_THIS_ID);
-        }
-        List<Task> task = em.createQuery("select t from Task t where t.userId =:workerId")
-                .setParameter("workerId", workerId)
-                .getResultList();
-
-        em.getTransaction().commit();
-        em.close();
-
-        return task;
-    }*/
-
 
     @Override
     public Status removeWorkerFromProject(Integer projectId, Integer workerId) {

@@ -148,7 +148,7 @@ public class ProjectService {
 
         if (removeProject != null && PROJECT_WAS_DROPPED_FROM_DATABASE.equals(removeProject.getStatus())) {
             for (Integer id : taskId) {
-                stringBuilder.append(taskDao.removeTask(id).getStatus() + "\n");
+                stringBuilder.append(taskDao.removeTask(id).getStatus() + LINE_BREAK);
                 fileRepository.deleteFileTask(fileDao.deleteFile(id).getStatus());
             }
         }

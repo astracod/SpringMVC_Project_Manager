@@ -18,6 +18,11 @@ import java.util.List;
 @Repository(value = "workerDaoImpl")
 public class WorkerDaoImpl implements WorkerDAO {
 
+    public static final String USER_WITH_THIS_LOGIN_IS_NOT_IN_THE_DATABASE = " Внимание!!! Пользователя с таким логином нет в базе данных.";
+    public static final String USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE = " Внимание!!! Пользователя с таким ID нет в базе данных.";
+    public static final String USER_ADDED_TO_DATABASE = " Пользователь добавлен в базу данных.";
+    public static final String USER_REMOVED_FROM_DATABASE = " Пользователь удален из базы данных.";
+
     private EntityManagerFactory entityManagerFactory;
 
 
@@ -52,7 +57,7 @@ public class WorkerDaoImpl implements WorkerDAO {
                     .setParameter("email", email)
                     .getSingleResult();
         } catch (Exception e) {
-            throw new UsernameNotFoundException(" Внимание!!! Пользователя с таким логином нет в базе данных.");
+            throw new UsernameNotFoundException(USER_WITH_THIS_LOGIN_IS_NOT_IN_THE_DATABASE);
         }
         em.close();
         return worker;
@@ -64,7 +69,7 @@ public class WorkerDaoImpl implements WorkerDAO {
         em.getTransaction().begin();
         Worker worker = em.find(Worker.class, workerId);
         if (worker == null) {
-            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
+            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE);
         }
         em.getTransaction().commit();
         em.close();
@@ -81,7 +86,7 @@ public class WorkerDaoImpl implements WorkerDAO {
                     .setParameter("workerId", workerId)
                     .getSingleResult();
         } catch (Exception e) {
-            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
+            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE);
         }
         em.getTransaction().commit();
         em.close();
@@ -101,7 +106,7 @@ public class WorkerDaoImpl implements WorkerDAO {
         em.persist(w);
         em.getTransaction().commit();
         em.close();
-        return getStatus(" Исполнитель добавлен в базу данных.");
+        return getStatus(USER_ADDED_TO_DATABASE);
     }
 
     @Override
@@ -111,7 +116,7 @@ public class WorkerDaoImpl implements WorkerDAO {
         Worker worker = em.find(Worker.class, workerId);
 
         if (worker == null) {
-            throw new RequestProcessingException(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных");
+            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE);
         }
 
         List<Project> projects = new ArrayList<>(worker.getProjects());
@@ -122,6 +127,6 @@ public class WorkerDaoImpl implements WorkerDAO {
         em.remove(worker);
         em.getTransaction().commit();
         em.close();
-        return getStatus(" Исполнитель удален из базы данных.");
+        return getStatus(USER_REMOVED_FROM_DATABASE);
     }
 }
