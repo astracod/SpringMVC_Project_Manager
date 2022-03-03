@@ -21,14 +21,17 @@ import java.util.Map;
 public class FileRepository {
 
     public static final String TASK_IS_FORMED_ON_REMOTE_RESOURCE = "Задача сформирована на удаленом ресурсе";
-    public static final String ERROR_IN_TRANSFER_OF_INFORMATION_TO_REMOTE_RESOURCE = "Ошибка передачи задачи в хранилище данных";
+    public static final String ERROR_IN_TRANSFER_OF_INFORMATION_TO_REMOTE_RESOURCE = "Ошибка передачи задачи в хранилище данных : ";
     public static final String FILE_EXTENSION = ".txt";
     public static final String SPACE = " ";
     public static final String UNDERSCORE = "_";
     public static final String DOUBLE_BACKSLASH = "\\";
     public static final String NEL = "\n";
-    public static final String ERROR_CREATING_DIRECTORY = "Ошибка создания удаленной директории";
-    public static final String ERROR_TO_RECEIVE_DATA_FROM_REMOTE_REPOSITORY = "Ошибка получения данных с удаленного репозитория";
+    public static final String ERROR_CREATING_DIRECTORY = "Ошибка создания удаленной директории : ";
+    public static final String ERROR_TO_RECEIVE_DATA_FROM_REMOTE_REPOSITORY = "Ошибка получения данных с удаленного репозитория : ";
+    public static final String ERROR_CREATING_DIRECTORY_2 = " при создании задачи : ";
+    public static final String ERROR_IN_TRANSFER_2 = " при записи в файл : ";
+    public static final String ERROR_TO_RECEIVE_2 = " при чтении файла : ";
     public final String REMOTE_REPOSITORY = "C:\\Users\\Admin\\Desktop\\scp";
 
     public Status giveTask(LocalDateTime dateCreateTask, String text, String taskName) {
@@ -43,13 +46,13 @@ public class FileRepository {
             try {
                 Files.createDirectories(Paths.get(REMOTE_REPOSITORY));
             } catch (IOException e) {
-                status.setStatus(ERROR_CREATING_DIRECTORY);
+                status.setStatus(ERROR_CREATING_DIRECTORY + REMOTE_REPOSITORY + ERROR_CREATING_DIRECTORY_2 + taskName);
             }
         }
         try {
             Files.write(Paths.get(lastPath), newText.getBytes(), new StandardOpenOption[]{StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND});
         } catch (IOException e) {
-            status.setStatus(ERROR_IN_TRANSFER_OF_INFORMATION_TO_REMOTE_RESOURCE);
+            status.setStatus(ERROR_IN_TRANSFER_OF_INFORMATION_TO_REMOTE_RESOURCE + REMOTE_REPOSITORY + ERROR_IN_TRANSFER_2 + taskName);
         }
         Map<String, String> fileNameFromTask = new HashMap<>();
         fileNameFromTask.put("fileName", fileName);
@@ -83,7 +86,7 @@ public class FileRepository {
                 stringBuilder.append(System.lineSeparator());
             }
         } catch (IOException e) {
-            stringBuilder.append(ERROR_TO_RECEIVE_DATA_FROM_REMOTE_REPOSITORY);
+            stringBuilder.append(ERROR_TO_RECEIVE_DATA_FROM_REMOTE_REPOSITORY + REMOTE_REPOSITORY + ERROR_TO_RECEIVE_2 + fileName);
         }
         return stringBuilder.toString();
     }
