@@ -57,7 +57,7 @@ public class WorkerDaoImpl implements WorkerDAO {
                     .setParameter("email", email)
                     .getSingleResult();
         } catch (Exception e) {
-            throw new UsernameNotFoundException(USER_WITH_THIS_LOGIN_IS_NOT_IN_THE_DATABASE);
+            throw new UsernameNotFoundException(USER_WITH_THIS_LOGIN_IS_NOT_IN_THE_DATABASE + email);
         }
         em.close();
         return worker;
@@ -69,7 +69,7 @@ public class WorkerDaoImpl implements WorkerDAO {
         em.getTransaction().begin();
         Worker worker = em.find(Worker.class, workerId);
         if (worker == null) {
-            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE);
+            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE + workerId);
         }
         em.getTransaction().commit();
         em.close();
@@ -86,7 +86,7 @@ public class WorkerDaoImpl implements WorkerDAO {
                     .setParameter("workerId", workerId)
                     .getSingleResult();
         } catch (Exception e) {
-            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE);
+            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE + workerId);
         }
         em.getTransaction().commit();
         em.close();
@@ -116,7 +116,7 @@ public class WorkerDaoImpl implements WorkerDAO {
         Worker worker = em.find(Worker.class, workerId);
 
         if (worker == null) {
-            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE);
+            throw new RequestProcessingException(USER_WITH_THIS_ID_IS_NOT_IN_THE_DATABASE + workerId);
         }
 
         List<Project> projects = new ArrayList<>(worker.getProjects());

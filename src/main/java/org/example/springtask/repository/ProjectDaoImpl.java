@@ -22,14 +22,14 @@ import java.util.List;
 public class ProjectDaoImpl implements ProjectDAO {
 
 
-    public static final String NO_USER_WITH_THIS_ID = " ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных";
-    public static final String NO_PROJECT_WITH_THIS_ID = " ВНИМАНИЕ!!!  Проекта с таким ID нет в базе данных";
+    public static final String NO_USER_WITH_THIS_ID = " ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных ";
+    public static final String NO_PROJECT_WITH_THIS_ID = " ВНИМАНИЕ!!!  Проекта с таким ID нет в базе данных ";
     public static final String GIVE_NAME_THE_PROJECT = "Задайте название проекту.";
     public static final String PROJECT_CREATE = " Проект создан.";
     public static final String PROJECT_REMOVED = "Проект удален из базы данных.";
     public static final String SUCCESSFUL_CHANGE_THE_NAME_OF_PROJECT = "Имя проекта успешно заменено";
     public static final String WORKER_DATA_SUCCESSFULLY_CHANGED = " Данные исполнителя изменены";
-    public static final String THE_PROJECT_WITH_THE_SPECIFIED_CONDITIONS_IS_NOT_IN_THE_DATABASE = "Проекта с заданными условиями нет в базе";
+    public static final String THE_PROJECT_WITH_THE_SPECIFIED_CONDITIONS_IS_NOT_IN_THE_DATABASE = "Проекта с заданными условиями нет в базе ";
     public static final String WORKER_REMOVED_FROM_PROJECT = "Исполнитель удален из проекта.";
 
 
@@ -116,7 +116,7 @@ public class ProjectDaoImpl implements ProjectDAO {
         em.getTransaction().begin();
         Project project = em.find(Project.class, projectId);
         if (project == null) {
-            throw new RequestProcessingException(NO_PROJECT_WITH_THIS_ID);
+            throw new RequestProcessingException(NO_PROJECT_WITH_THIS_ID + projectId);
         }
         em.getTransaction().commit();
         em.close();
@@ -132,7 +132,7 @@ public class ProjectDaoImpl implements ProjectDAO {
                 .getSingleResult();
 
         if (project == null) {
-            throw new RequestProcessingException(NO_PROJECT_WITH_THIS_ID);
+            throw new RequestProcessingException(NO_PROJECT_WITH_THIS_ID + projectId);
         }
         em.getTransaction().commit();
         em.close();
@@ -160,7 +160,7 @@ public class ProjectDaoImpl implements ProjectDAO {
         em.getTransaction().begin();
         Project project = em.find(Project.class, projectId);
         if (project == null) {
-            return getStatus(NO_PROJECT_WITH_THIS_ID);
+            return getStatus(NO_PROJECT_WITH_THIS_ID + projectId);
         }
         List<Task> tasks = new ArrayList<>(project.getTasks());
         for (Task task : tasks) {
@@ -180,7 +180,7 @@ public class ProjectDaoImpl implements ProjectDAO {
         em.getTransaction().begin();
         Project project = em.find(Project.class, projectId);
         if (project == null) {
-            return getStatus(NO_PROJECT_WITH_THIS_ID);
+            return getStatus(NO_PROJECT_WITH_THIS_ID + projectId);
         }
         project.setProjectName(newNameProject);
         em.persist(project);
@@ -199,7 +199,7 @@ public class ProjectDaoImpl implements ProjectDAO {
          */
         Project project = em.find(Project.class, projectId);
         if (project == null) {
-            return getStatus(NO_PROJECT_WITH_THIS_ID);
+            return getStatus(NO_PROJECT_WITH_THIS_ID + projectId);
         }
 
         /**
@@ -207,7 +207,7 @@ public class ProjectDaoImpl implements ProjectDAO {
          */
         Worker worker = em.find(Worker.class, workerId);
         if (worker == null) {
-            return getStatus(NO_USER_WITH_THIS_ID);
+            return getStatus(NO_USER_WITH_THIS_ID + workerId);
         }
 
         /**
@@ -229,11 +229,11 @@ public class ProjectDaoImpl implements ProjectDAO {
         Project project = em.find(Project.class, projectId);
 
         if (project == null) {
-            return getStatus(THE_PROJECT_WITH_THE_SPECIFIED_CONDITIONS_IS_NOT_IN_THE_DATABASE);
+            return getStatus(THE_PROJECT_WITH_THE_SPECIFIED_CONDITIONS_IS_NOT_IN_THE_DATABASE + projectId);
         }
         Worker worker = em.find(Worker.class, workerId);
         if (worker == null) {
-            return getStatus(NO_USER_WITH_THIS_ID);
+            return getStatus(NO_USER_WITH_THIS_ID + workerId);
         }
 
         project.removeWorker(worker);

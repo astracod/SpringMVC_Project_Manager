@@ -56,7 +56,7 @@ public class FileDaoImpl implements FileDAO {
             name = file.getPathToFile();
             em.remove(file);
         } catch (Exception e) {
-            return getStatus(NO_FILE_WITH_THIS_ID);
+            return getStatus(NO_FILE_WITH_THIS_ID + taskId);
         }
         em.getTransaction().commit();
         em.close();
@@ -72,7 +72,7 @@ public class FileDaoImpl implements FileDAO {
             File file = em.find(File.class, id);
             name = file.getPathToFile();
         } catch (Exception e) {
-            return getStatus(NO_FILE_WITH_THIS_ID);
+            return getStatus(NO_FILE_WITH_THIS_ID + id);
         }
         em.getTransaction().commit();
         em.close();
