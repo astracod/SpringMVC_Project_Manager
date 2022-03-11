@@ -13,6 +13,10 @@ import javax.persistence.EntityManagerFactory;
 @Repository(value = "fileDaoImpl")
 public class FileDaoImpl implements FileDAO {
 
+
+    public static final String FILE_PATH_STORED = "Путь к файлу записан в Базу Данных";
+    public static final String NO_FILE_WITH_THIS_ID = "Файла с таким ID нет в базе данных.";
+
     private EntityManagerFactory entityManagerFactory;
 
 
@@ -39,7 +43,7 @@ public class FileDaoImpl implements FileDAO {
         em.persist(file);
         em.getTransaction().commit();
         em.close();
-        return getStatus("Путь к файлу записан в Базу Данных");
+        return getStatus(FILE_PATH_STORED);
     }
 
     @Override
@@ -52,7 +56,7 @@ public class FileDaoImpl implements FileDAO {
             name = file.getPathToFile();
             em.remove(file);
         } catch (Exception e) {
-            return getStatus("Файла с таким ID нет в базе данных.");
+            return getStatus(NO_FILE_WITH_THIS_ID + taskId);
         }
         em.getTransaction().commit();
         em.close();
@@ -68,7 +72,7 @@ public class FileDaoImpl implements FileDAO {
             File file = em.find(File.class, id);
             name = file.getPathToFile();
         } catch (Exception e) {
-            return getStatus("Файла с таким ID нет в базе данных.");
+            return getStatus(NO_FILE_WITH_THIS_ID + id);
         }
         em.getTransaction().commit();
         em.close();

@@ -17,6 +17,15 @@ import java.util.List;
 @Repository(value = "taskDaoImpl")
 public class TaskDaoImpl implements TaskDAO {
 
+    public static final String NO_SUCH_TASKS_IN_THE_DATABASE = " Внимание!!! В базе данных нет задач.";
+    public static final String NO_TASKS_WITH_THIS_ID = " Внимание!!! Задачи с таким ID  нет в базе данных. ";
+    public static final String TASK_CREATED_IN_THE_DATABASE = "Задача создана в базе данных.";
+    public static final String TASK_TEXT_UPDATED = "Текст задачи обновлен в удаленном хранилище.";
+    public static final String TASK_REMOVED_FROM_DATABASE = "Задача удалена из базы данных : ";
+    public static final String EMPLOYEE_WITH_SUCH_ID_IS_NOT_IN_THE_DATABASE = " ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных. ";
+    public static final String EXECUTOR_IS_ASSIGNED_TO_TASK = " Исполнитель присвоен задаче";
+    public static final String EXECUTOR_REMOVED_FROM_TASK = " Исполнитель удален из задачи";
+    public static final String SYMBOL_POINT = " .";
     private EntityManagerFactory entityManagerFactory;
 
 
@@ -37,7 +46,7 @@ public class TaskDaoImpl implements TaskDAO {
         em.getTransaction().begin();
         List tasks = em.createQuery("from Task").getResultList();
         if (tasks == null) {
-            throw new RequestProcessingException(" Внимание!!! В базе данных нет задач.");
+            throw new RequestProcessingException(NO_SUCH_TASKS_IN_THE_DATABASE);
         }
         em.getTransaction().commit();
         em.close();
@@ -50,7 +59,7 @@ public class TaskDaoImpl implements TaskDAO {
         em.getTransaction().begin();
         Task task = em.find(Task.class, taskId);
         if (task == null) {
-            throw new RequestProcessingException(" Внимание!!! Задачи с таким ID  нет в базе данных. " + taskId);
+            throw new RequestProcessingException(NO_TASKS_WITH_THIS_ID + taskId);
         }
         em.getTransaction().commit();
         em.close();
@@ -91,7 +100,7 @@ public class TaskDaoImpl implements TaskDAO {
         em.getTransaction().commit();
         em.close();
 
-        return getStatus("Задача создана в базе данных.");
+        return getStatus(TASK_CREATED_IN_THE_DATABASE);
     }
 
     @Override
@@ -105,7 +114,7 @@ public class TaskDaoImpl implements TaskDAO {
         em.persist(task);
         em.getTransaction().commit();
         em.close();
-        return getStatus("Текст задачи обновлен в удаленном хранилище.");
+        return getStatus(TASK_TEXT_UPDATED);
     }
 
     @Override
@@ -115,12 +124,12 @@ public class TaskDaoImpl implements TaskDAO {
         Task task = em.find(Task.class, taskId);
 
         if (task == null) {
-            return getStatus("Задачи с таким ID  нет в базе данных. " + taskId);
+            return getStatus(NO_TASKS_WITH_THIS_ID + taskId);
         }
         em.remove(task);
         em.getTransaction().commit();
         em.close();
-        return getStatus("Задача удалена из базы данных : " + taskId + " .");
+        return getStatus(TASK_REMOVED_FROM_DATABASE + taskId + SYMBOL_POINT);
     }
 
     @Override
@@ -130,12 +139,12 @@ public class TaskDaoImpl implements TaskDAO {
 
         Worker worker = em.find(Worker.class, workerId);
         if (worker == null) {
-            return getStatus(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных. " + workerId);
+            return getStatus(EMPLOYEE_WITH_SUCH_ID_IS_NOT_IN_THE_DATABASE + workerId);
         }
 
         Task task = em.find(Task.class, taskId);
         if (task == null) {
-            throw new RequestProcessingException(" Внимание!!! Задачи с таким ID нет в базе данных. " + taskId);
+            throw new RequestProcessingException(NO_TASKS_WITH_THIS_ID + taskId);
         }
 
         task.setUserId(workerId);
@@ -143,7 +152,7 @@ public class TaskDaoImpl implements TaskDAO {
         em.getTransaction().commit();
         em.close();
 
-        return getStatus(" Исполнитель присвоен задаче");
+        return getStatus(EXECUTOR_IS_ASSIGNED_TO_TASK);
     }
 
     @Override
@@ -153,12 +162,12 @@ public class TaskDaoImpl implements TaskDAO {
 
         Worker worker = em.find(Worker.class, workerId);
         if (worker == null) {
-            return getStatus(" ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных " + workerId);
+            return getStatus(EMPLOYEE_WITH_SUCH_ID_IS_NOT_IN_THE_DATABASE + workerId);
         }
 
         Task task = em.find(Task.class, taskId);
         if (task == null) {
-            throw new RequestProcessingException(" Внимание!!! Задачи с таким ID нет в базе данных. " + taskId);
+            throw new RequestProcessingException(NO_TASKS_WITH_THIS_ID + taskId);
         }
 
         task.setUserId(null);
@@ -166,7 +175,7 @@ public class TaskDaoImpl implements TaskDAO {
         em.getTransaction().commit();
         em.close();
 
-        return getStatus(" Исполнитель удален из задачи");
+        return getStatus(EXECUTOR_REMOVED_FROM_TASK);
     }
 
     public List<Task> returnSheetTask(Integer workerId) {
@@ -175,7 +184,7 @@ public class TaskDaoImpl implements TaskDAO {
 
         Worker worker = em.find(Worker.class, workerId);
         if (worker == null) {
-            throw new RequestProcessingException(" Внимание!!! Сотрудника с таким ID нет в базе данных. "+ workerId);
+            throw new RequestProcessingException(EMPLOYEE_WITH_SUCH_ID_IS_NOT_IN_THE_DATABASE + workerId);
         }
         List<Task> task = em.createQuery("select t from Task t where t.userId =:workerId")
                 .setParameter("workerId", workerId)

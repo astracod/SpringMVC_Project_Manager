@@ -8,7 +8,10 @@ import org.example.springtask.entity.Worker;
 import org.example.springtask.exception.RequestProcessingException;
 import org.example.springtask.mapping.ProjectMapping;
 import org.example.springtask.repository.FileRepository;
-import org.example.springtask.repository.ProjectDAO;
+import org.example.springtask.repository.interfaces.FileDAO;
+import org.example.springtask.repository.interfaces.ProjectDAO;
+import org.example.springtask.repository.interfaces.TaskDAO;
+import org.example.springtask.repository.interfaces.WorkerDAO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +49,15 @@ class ProjectServiceTest {
 
     @Mock
     private ProjectDAO projectDAO;
+
+    @Mock
+    private WorkerDAO workerDAO;
+
+    @Mock
+    private TaskDAO taskDAO;
+
+    @Mock
+    private FileDAO fileDAO;
 
     @InjectMocks
     private ProjectService projectService;
@@ -86,7 +98,14 @@ class ProjectServiceTest {
     public static final String WORD_TASK = " Задача : ";
     public static final String WORD_DELETED = " удалена.";
     public static final String SYMBOL_POINT = ".";
+    public static final String COMMA = " , ";
+    public static final String COLON = " : ";
+    public static final String SEMICOLON = " ; ";
+    public static final String LINE_BREAK = "\n";
     public static final String FORMAT_FOR_TIME_AND_DATE = "yyyy-MM-dd HH:mm:ss";
+    public static final String CHANGE_TIME_VIEW_FIRST_SYMBOL = "T";
+    public static final String CHANGE_TIME_VIEW_SECOND_SYMBOL = " ";
+    public static final char SPACE = '\u0020';
 
     @Test
     void shouldGetAllInfoByWorkerIdThenNotProjects() {
@@ -101,7 +120,7 @@ class ProjectServiceTest {
         worker.setLastName(WORKER_LAST_NAME);
         worker.setProjects(List.of());
 
-        when(projectDAO.getAllInfoByWorkerId(WORKER_ID)).thenReturn(returnWorker);
+        when(workerDAO.getAllInfoByWorkerId(WORKER_ID)).thenReturn(returnWorker);
         when(projectDAO.getAllProjectTasksByWorkerId(WORKER_ID)).thenReturn(List.of());
         when(projectMapping.toFullWorker(returnWorker)).thenReturn(worker);
 
@@ -130,7 +149,7 @@ class ProjectServiceTest {
         worker.setProjects(List.of(projectInfo));
 
 
-        when(projectDAO.getAllInfoByWorkerId(WORKER_ID)).thenReturn(returnWorker);
+        when(workerDAO.getAllInfoByWorkerId(WORKER_ID)).thenReturn(returnWorker);
         when(projectMapping.toFullWorker(returnWorker)).thenReturn(worker);
 
         Task task = new Task();
@@ -152,7 +171,7 @@ class ProjectServiceTest {
 
     @Test
     void shouldThrowIfGetAllInfoByWorkerIdThrow() {
-        when(projectDAO.getAllInfoByWorkerId(WORKER_ID)).thenThrow(new RuntimeException());
+        when(workerDAO.getAllInfoByWorkerId(WORKER_ID)).thenThrow(new RuntimeException());
 
         assertThatThrownBy(() -> projectService.getAllInfoByWorkerId(WORKER_ID))
                 .withFailMessage(GET_All_INFO_ABOUT_WORKER_SERVICE_CHECK_WITH_WRONG_ID)
@@ -213,7 +232,7 @@ class ProjectServiceTest {
         when(projectDAO.getAllProjectTasksByProjectId(WORKER_ID)).thenReturn(List.of(task));
         when(projectMapping.toDtoList(List.of(task))).thenReturn(List.of(taskDto));
 
-        when(projectDAO.getFilePath(WORKER_ID)).thenReturn(status);
+        when(fileDAO.getFilePath(WORKER_ID)).thenReturn(status);
         when(fileRepository.getFileTaskByFileId(status.getStatus())).thenReturn(null);
 
         ProjectDto expectedProjectDto = new ProjectDto();
@@ -249,7 +268,7 @@ class ProjectServiceTest {
 
         List<WorkerDto> workersDtoList = List.of(workerDto1, workerDto2);
 
-        when(projectDAO.allWorkers()).thenReturn(workers);
+        when(workerDAO.allWorkers()).thenReturn(workers);
         when(projectMapping.toWorkersDto(workers)).thenReturn(workersDtoList);
 
         List<WorkerDto> result = projectService.showAllUsers();
@@ -266,7 +285,7 @@ class ProjectServiceTest {
 
         String codPassword = encoder.encode(PASSWORD);
 
-        when(projectDAO.createWorker(WORKER_FIRST_NAME, WORKER_LAST_NAME, LOGIN, codPassword)).thenReturn(expectedStatus);
+        when(workerDAO.createWorker(WORKER_FIRST_NAME, WORKER_LAST_NAME, LOGIN, codPassword)).thenReturn(expectedStatus);
 
         Status actualStatus = projectService.saveWorker(WORKER_FIRST_NAME, WORKER_LAST_NAME, LOGIN, PASSWORD);
 
@@ -310,11 +329,11 @@ class ProjectServiceTest {
         statusForRemoveWorker.setStatus(SUCCESSFUL_STATUS_AFTER_REMOVE_WORKER_FROM_DATABASE);
 
         Status expectedStatus = new Status();
-        expectedStatus.setStatus(SUCCESSFUL_STATUS_AFTER_REMOVE_WORKER_FROM_TASK + '\u0020' + SUCCESSFUL_STATUS_AFTER_REMOVE_WORKER_FROM_DATABASE + '\u0020');
+        expectedStatus.setStatus(SUCCESSFUL_STATUS_AFTER_REMOVE_WORKER_FROM_TASK + SPACE + SUCCESSFUL_STATUS_AFTER_REMOVE_WORKER_FROM_DATABASE + SPACE);
 
-        when(projectDAO.returnSheetTask(WORKER_ID)).thenReturn(tasks);
-        when(projectDAO.removeExecutorFromTask(task.getId(), WORKER_ID)).thenReturn(statusForRemoveExecutorFromTask);
-        when(projectDAO.removeWorker(WORKER_ID)).thenReturn(statusForRemoveWorker);
+        when(taskDAO.returnSheetTask(WORKER_ID)).thenReturn(tasks);
+        when(taskDAO.removeExecutorFromTask(task.getId(), WORKER_ID)).thenReturn(statusForRemoveExecutorFromTask);
+        when(workerDAO.removeWorker(WORKER_ID)).thenReturn(statusForRemoveWorker);
 
         Status actualStatus = projectService.removeWorker(WORKER_ID);
 
@@ -380,12 +399,12 @@ class ProjectServiceTest {
         pathFromDeleteFile.setStatus(PATH_TO_FILE);
 
         Status expected = new Status();
-        expected.setStatus(removeProject.getStatus() + " , " + removeTaskFromDB.getStatus() + "\n");
+        expected.setStatus(removeProject.getStatus() + COMMA + removeTaskFromDB.getStatus() + LINE_BREAK);
 
         when(projectDAO.getProjectForDeleteTask(WORKER_ID)).thenReturn(projectForGetProjectForDeleteTask);
         when(projectDAO.removeProject(WORKER_ID)).thenReturn(removeProject);
-        when(projectDAO.removeTask(WORKER_ID)).thenReturn(removeTaskFromDB);
-        when(projectDAO.deleteFile(WORKER_ID)).thenReturn(pathFromDeleteFile);
+        when(taskDAO.removeTask(WORKER_ID)).thenReturn(removeTaskFromDB);
+        when(fileDAO.deleteFile(WORKER_ID)).thenReturn(pathFromDeleteFile);
         when(fileRepository.deleteFileTask(PATH_TO_FILE)).thenReturn(true);
 
         Status result = projectService.removeProject(WORKER_ID);
@@ -442,7 +461,7 @@ class ProjectServiceTest {
         List<TaskDto> expected = List.of(taskDto);
 
 
-        when(projectDAO.getAllTasks()).thenReturn(tasks);
+        when(taskDAO.getAllTasks()).thenReturn(tasks);
         when(projectMapping.toDtoList(tasks)).thenReturn(expected);
         List result = projectService.getAllTasks();
 
@@ -464,7 +483,7 @@ class ProjectServiceTest {
         taskDto.setDateCreateTask(null);
         taskDto.setUserId(WORKER_ID);
 
-        when(projectDAO.getTask(WORKER_ID)).thenReturn(task);
+        when(taskDAO.getTask(WORKER_ID)).thenReturn(task);
         when(projectMapping.toTask(task)).thenReturn(taskDto);
 
         TaskDto result = projectService.getTask(WORKER_ID);
@@ -486,17 +505,17 @@ class ProjectServiceTest {
         LocalDateTime myTime = LocalDateTime.now(fixedClock);
 
 
-        String answerDate = myTime.toString().substring(0, myTime.toString().indexOf("T"))
-                .concat(" ")
+        String answerDate = myTime.toString().substring(0, myTime.toString().indexOf(CHANGE_TIME_VIEW_FIRST_SYMBOL))
+                .concat(CHANGE_TIME_VIEW_SECOND_SYMBOL)
                 .concat(myTime.toString().substring(11, 19));
 
 
         Status expected = new Status();
-        expected.setStatus(refreshStatus.getStatus() + " : " + answerDate);
+        expected.setStatus(refreshStatus.getStatus() + COLON + answerDate);
 
 
-        when(projectDAO.getTaskByName(TASK_NAME)).thenReturn(WORKER_ID);
-        when(projectDAO.refreshTask(WORKER_ID, TASK_NAME, myTime, WORKER_ID)).thenReturn(refreshStatus);
+        when(taskDAO.getTaskByName(TASK_NAME)).thenReturn(WORKER_ID);
+        when(taskDAO.refreshTask(WORKER_ID, TASK_NAME, myTime, WORKER_ID)).thenReturn(refreshStatus);
         //when(fileRepository.giveTask(myTime, TASK_TEXT, TASK_NAME)).thenReturn(statusForGiveTaskFileRepository);
 
         Status result = projectService.createTask(TASK_TEXT, TASK_NAME, WORKER_ID);
@@ -527,20 +546,20 @@ class ProjectServiceTest {
 
         LocalDateTime myTime = LocalDateTime.now(fixedClock);
 
-        String answerDate = myTime.toString().substring(0, myTime.toString().indexOf("T"))
-                .concat(" ")
+        String answerDate = myTime.toString().substring(0, myTime.toString().indexOf(CHANGE_TIME_VIEW_FIRST_SYMBOL))
+                .concat(CHANGE_TIME_VIEW_SECOND_SYMBOL)
                 .concat(myTime.toString().substring(11, 19));
 
         Status expected = new Status();
-        expected.setStatus(statusForGiveTaskFileRepository.getStatus() + " ; " + taskCreate.getStatus() + " ; " + filePathWroteInDB.getStatus() + " : " + answerDate);
+        expected.setStatus(statusForGiveTaskFileRepository.getStatus() + SEMICOLON + taskCreate.getStatus() + SEMICOLON + filePathWroteInDB.getStatus() + COLON + answerDate);
 
-        when(projectDAO.getTaskByName(TASK_NAME)).thenReturn(NEGATIVE_DATABASE_ANSWER).thenReturn(WORKER_ID);
+        when(taskDAO.getTaskByName(TASK_NAME)).thenReturn(NEGATIVE_DATABASE_ANSWER).thenReturn(WORKER_ID);
 
-        when(projectDAO.createTask(TASK_NAME, myTime, WORKER_ID)).thenReturn(taskCreate);
+        when(taskDAO.createTask(TASK_NAME, myTime, WORKER_ID)).thenReturn(taskCreate);
 
         when(fileRepository.giveTask(myTime, TASK_TEXT, TASK_NAME)).thenReturn(statusForGiveTaskFileRepository);
 
-        when(projectDAO.createFile(WORKER_ID, PATH_TO_FILE)).thenReturn(filePathWroteInDB);
+        when(fileDAO.createFile(WORKER_ID, PATH_TO_FILE)).thenReturn(filePathWroteInDB);
 
         Status result = projectService.createTask(TASK_TEXT, TASK_NAME, WORKER_ID);
 
@@ -559,8 +578,8 @@ class ProjectServiceTest {
         Status expended = new Status();
         expended.setStatus(WORD_TASK + deleteFileFromTableFile.getStatus().substring(0, deleteFileFromTableFile.getStatus().indexOf(SYMBOL_POINT)) + WORD_DELETED);
 
-        when(projectDAO.removeTask(WORKER_ID)).thenReturn(deleteTaskFromTableTask);
-        when(projectDAO.deleteFile(WORKER_ID)).thenReturn(deleteFileFromTableFile);
+        when(taskDAO.removeTask(WORKER_ID)).thenReturn(deleteTaskFromTableTask);
+        when(fileDAO.deleteFile(WORKER_ID)).thenReturn(deleteFileFromTableFile);
         when(fileRepository.deleteFileTask(deleteFileFromTableFile.getStatus())).thenReturn(true);
 
         Status result = projectService.removeTask(WORKER_ID);
@@ -580,8 +599,8 @@ class ProjectServiceTest {
         Status expended = new Status();
         expended.setStatus(THE_TASK_DID_NOT_REMOVE);
 
-        when(projectDAO.removeTask(WORKER_ID)).thenReturn(deleteTaskFromTableTask);
-        when(projectDAO.deleteFile(WORKER_ID)).thenReturn(deleteFileFromTableFile);
+        when(taskDAO.removeTask(WORKER_ID)).thenReturn(deleteTaskFromTableTask);
+        when(fileDAO.deleteFile(WORKER_ID)).thenReturn(deleteFileFromTableFile);
         when(fileRepository.deleteFileTask(deleteFileFromTableFile.getStatus())).thenReturn(false);
 
         Status result = projectService.removeTask(WORKER_ID);
@@ -595,7 +614,7 @@ class ProjectServiceTest {
         Status expended = new Status();
         expended.setStatus(THE_EXECUTOR_ASSIGNED_TO_TASK);
 
-        when(projectDAO.assignAnExecutorToTask(WORKER_ID, WORKER_ID)).thenReturn(expended);
+        when(taskDAO.assignAnExecutorToTask(WORKER_ID, WORKER_ID)).thenReturn(expended);
 
         Status result = projectService.assignAnExecutorToTask(WORKER_ID, WORKER_ID);
 
@@ -608,7 +627,7 @@ class ProjectServiceTest {
         Status expended = new Status();
         expended.setStatus(THE_EXECUTOR_REMOVED_FROM_TASK);
 
-        when(projectDAO.removeExecutorFromTask(WORKER_ID, WORKER_ID)).thenReturn(expended);
+        when(taskDAO.removeExecutorFromTask(WORKER_ID, WORKER_ID)).thenReturn(expended);
 
         Status result = projectService.removeExecutorFromTask(WORKER_ID, WORKER_ID);
 
