@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 @Setter
 @Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode

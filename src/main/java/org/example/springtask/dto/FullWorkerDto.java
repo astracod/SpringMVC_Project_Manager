@@ -8,6 +8,8 @@ import java.util.List;
 public class FullWorkerDto {
 
     private WorkerWithProjectsDto worker;
-    //private List<ProjectDto> projects;
+
     private List<TaskDto> tasks;
+
+
 }

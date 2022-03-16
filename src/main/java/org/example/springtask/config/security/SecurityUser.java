@@ -61,5 +61,4 @@ public class SecurityUser implements UserDetails {
                 List.of(new SimpleGrantedAuthority(worker.getRole().name()))
         );
     }
-
 }

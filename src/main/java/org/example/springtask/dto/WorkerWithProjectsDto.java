@@ -1,7 +1,6 @@
 package org.example.springtask.dto;
 
 import lombok.Data;
-import org.example.springtask.entity.Project;
 
 import java.util.List;
 
@@ -15,4 +14,6 @@ public class WorkerWithProjectsDto {
     private String lastName;
 
     private List<ProjectInfoForWorkerDto> projects;
+
+
 }
