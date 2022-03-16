@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Entity(name = "Worker")
 @Table(name = "users")
 public class Worker {
