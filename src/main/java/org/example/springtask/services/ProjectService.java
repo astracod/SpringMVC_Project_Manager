@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 @Service(value = "projectService")
 public class ProjectService {
 
-    public static final String VALIDATION_TASK_NAME = "Введите корректное название задачи. Использовать стиль написани CamelCase нельзя";
+    public static final String VALIDATION_TASK_NAME = "Введите корректное название задачи. Использовать стиль написания CamelCase нельзя";
     private ProjectDAO projectDao;
     private FileRepository fileRepository;
     private ProjectMapping mapping;
