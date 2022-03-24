@@ -1,40 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Аутентификация</title>
+    <title th:utext="#{title.authentication}"></title>
 </head>
 <body>
-<h1>Аутентификация</h1>
+<h1 th:utext="#{title.authentication}"></h1>
 
 <form th:action="@{/login}" method="post">
-
     <div th:if="${param.error}">
         <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
     </div>
-
     <div th:if="${param.logout}">
         <p class="text-warning">You have been logged out.</p>
     </div>
     <p>
-        <label for="username">Username</label>:
-        <input type="text" id="username" name="username" autofocus="autofocus"/> <br/>
+        <label for="username" th:utext="#{username}"></label>:
+        <input type="text" id="username" name="username" autofocus="autofocus"/><br/>
     </p>
     <p>
-        <label for="password">Password</label>:
+        <label for="password" th:utext="#{password}"></label>:
         <input type="password" id="password" name="password"/> <br/>
     </p>
     <p>
-        <button type="submit">Войти</button>
+        <button type="submit" th:utext="#{login}"></button>
     </p>
 </form>
-
 <br/>
 <hr>
-
 <form th:action="@{/registration}" method="get">
-    <button type="submit">РЕГИСТРАЦИЯ</button>
+    <button type="submit" th:utext="#{sign.up}"></button>
 </form>
-
 <br/>
 <hr/>
 </body>

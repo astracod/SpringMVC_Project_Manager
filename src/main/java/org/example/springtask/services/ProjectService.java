@@ -5,36 +5,67 @@ import org.example.springtask.dto.*;
 import org.example.springtask.entity.Project;
 import org.example.springtask.entity.Task;
 import org.example.springtask.entity.Worker;
+import org.example.springtask.exception.RequestProcessingException;
 import org.example.springtask.mapping.ProjectMapping;
 import org.example.springtask.repository.FileRepository;
-import org.example.springtask.repository.ProjectDAO;
+import org.example.springtask.repository.interfaces.FileDAO;
+import org.example.springtask.repository.interfaces.ProjectDAO;
+import org.example.springtask.repository.interfaces.TaskDAO;
+import org.example.springtask.repository.interfaces.WorkerDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
 @Service(value = "projectService")
 public class ProjectService {
 
+    public static final String BAD_CREDENTIALS_IN_SAVE_WORKER = "Заполните все требуемые поля данных пользователя при регистрации.";
+    public static final String PROJECT_WAS_DROPPED_FROM_DATABASE = "Проект удален из базы данных.";
+    public static final String TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String CHANGE_TIME_VIEW_FIRST_SYMBOL = "T";
+    public static final String CHANGE_TIME_VIEW_SECOND_SYMBOL = " ";
+    public static final String COLON = " : ";
+    public static final String SEMICOLON = " ; ";
+    public static final String WORD_TASK = " Задача : ";
+    public static final String WORD_DELETED = " удалена.";
+    public static final String SYMBOL_POINT = ".";
+    public static final String THE_TASK_DID_NOT_REMOVE = "Задача не удалена";
+    public static final String THE_BD_DOESNT_HAVE_PROJECT_WITH_THIS_ID = " ВНИМАНИЕ!!!  Проекта с таким ID исполнителя нет в базе данных";
+    public static final String THE_DB_DOESNT_HAVE_WORKER_WITH_THIS_ID = " ВНИМАНИЕ!!!  Исполнителя с таким ID нет в базе данных";
+    public static final String COMMA = " , ";
+    public static final String LINE_BREAK = "\n";
+    public static final char SPACE = '\u0020';
+
     private ProjectDAO projectDao;
+    private WorkerDAO workerDao;
+    private TaskDAO taskDao;
+    private FileDAO fileDao;
     private FileRepository fileRepository;
     private ProjectMapping mapping;
     private PasswordEncoder passwordEncoder;
+    private Clock clock;
 
     @Autowired
-    public ProjectService(ProjectDAO projectDao, FileRepository fileRepository, ProjectMapping mapping, PasswordEncoder passwordEncoder) {
+    public ProjectService(ProjectDAO projectDao, WorkerDAO workerDao, TaskDAO taskDao, FileDAO fileDao, FileRepository fileRepository, ProjectMapping mapping, PasswordEncoder passwordEncoder, Clock clock) {
         this.projectDao = projectDao;
+        this.workerDao = workerDao;
+        this.taskDao = taskDao;
+        this.fileDao = fileDao;
         this.fileRepository = fileRepository;
         this.mapping = mapping;
         this.passwordEncoder = passwordEncoder;
+        this.clock = clock;
     }
 
     public List<WorkerDto> showAllUsers() {
-        List workers = projectDao.allWorkers();
+        List workers = workerDao.allWorkers();
         return mapping.toWorkersDto(workers);
     }
 
@@ -42,34 +73,34 @@ public class ProjectService {
 
         Status status = new Status();
         if (firstName == null || lastName == null || login == null || password == null) {
-            status.setStatus("Заполните все требуемые поля данных пользователя при регистрации.");
+            status.setStatus(BAD_CREDENTIALS_IN_SAVE_WORKER);
         } else {
             String codPassword = passwordEncoder.encode(password);
-            status = projectDao.createWorker(firstName, lastName, login, codPassword);
+            status = workerDao.createWorker(firstName, lastName, login, codPassword);
         }
         return status;
     }
 
     public Status removeWorker(Integer workerId) {
-        List<Task> tasks = projectDao.returnSheetTask(workerId);
+        List<Task> tasks = taskDao.returnSheetTask(workerId);
 
         Set<String> statuses = new HashSet<>();
 
         if (!tasks.isEmpty()) {
             tasks.forEach(task -> {
-                statuses.add(projectDao.removeExecutorFromTask(task.getId(), workerId).getStatus());
+                statuses.add(taskDao.removeExecutorFromTask(task.getId(), workerId).getStatus());
             });
         }
 
-        statuses.add(projectDao.removeWorker(workerId).getStatus());
+        statuses.add(workerDao.removeWorker(workerId).getStatus());
 
         Status status = new Status();
         StringBuilder answer = new StringBuilder();
         statuses.forEach(status1 -> {
-                    answer.append(status1).append(" ; ");
+                    answer.append(status1).append(SPACE);
                 }
-
         );
+        status.setStatus(answer.toString());
 
         return status;
     }
@@ -82,12 +113,12 @@ public class ProjectService {
      */
     @Transactional(readOnly = true)
     public SecurityWorkerDto getWorkerByEmail(String email) {
-        Worker worker = projectDao.getWorkerByEmail(email);
+        Worker worker = workerDao.getWorkerByEmail(email);
         return mapping.toSecurityWorker(worker);
     }
 
     public WorkerDto getWorker(Integer workerId) {
-        return mapping.toWorker(projectDao.getWorker(workerId));
+        return mapping.toWorker(workerDao.getWorker(workerId));
     }
 
 
@@ -115,14 +146,14 @@ public class ProjectService {
         Status removeTask = new Status();
         StringBuilder stringBuilder = new StringBuilder();
 
-        if (removeProject.getStatus().equals("Проект удален из базы данных.")) {
+        if (removeProject != null && PROJECT_WAS_DROPPED_FROM_DATABASE.equals(removeProject.getStatus())) {
             for (Integer id : taskId) {
-                stringBuilder.append(projectDao.removeTask(id).getStatus() + "\n");
-                fileRepository.deleteFileTask(projectDao.deleteFile(id).getStatus());
+                stringBuilder.append(taskDao.removeTask(id).getStatus() + LINE_BREAK);
+                fileRepository.deleteFileTask(fileDao.deleteFile(id).getStatus());
             }
         }
 
-        removeTask.setStatus(removeProject.getStatus() + " , " + stringBuilder.toString());
+        removeTask.setStatus(removeProject.getStatus() + COMMA + stringBuilder.toString());
 
         return removeTask;
     }
@@ -141,152 +172,103 @@ public class ProjectService {
 
 
     public List getAllTasks() {
-        return mapping.toDtoList(projectDao.getAllTasks());
+        return mapping.toDtoList(taskDao.getAllTasks());
     }
 
     public TaskDto getTask(Integer taskId) {
-        return mapping.toTask(projectDao.getTask(taskId));
+        return mapping.toTask(taskDao.getTask(taskId));
     }
 
     @Transactional
     public Status createTask(String text, String taskName, Integer projectId) {
-        Status statusRefresh;
-        Status statusCreate;
-        Status createFile = null;
         Status statusTheEnd = new Status();
-        String statusTask;
-        String path = "";
-        Integer taskId;
-        LocalDateTime dateTime = LocalDateTime.now();
 
-        Status statusRemote = fileRepository.giveTask(dateTime, text, taskName);
+        LocalDateTime dateTime = LocalDateTime.now(clock);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
+        String textTime = dateTime.format(formatter);
+        LocalDateTime parsedDate = LocalDateTime.parse(textTime, formatter);
 
-        taskId = projectDao.getTaskByName(taskName);
+        Integer taskId = taskDao.getTaskByName(taskName);
+        String answerDate = parsedDate.toString().substring(0, parsedDate.toString().indexOf(CHANGE_TIME_VIEW_FIRST_SYMBOL))
+                .concat(CHANGE_TIME_VIEW_SECOND_SYMBOL)
+                .concat(parsedDate.toString().substring(11, 19));
+
 
         if (taskId > 0) {
-            statusRefresh = projectDao.refreshTask(taskId, taskName, dateTime, projectId);
-            statusTask = statusRefresh.getStatus();
+            statusTheEnd.setStatus(refreshTaskInRemoteRepositoryAndDB(taskName, text, projectId, taskId, dateTime, answerDate));
         } else {
-            statusCreate = projectDao.createTask(taskName, dateTime, projectId);
-            statusTask = statusCreate.getStatus();
-            taskId = projectDao.getTaskByName(taskName);
-            Optional<String> addressTask = statusRemote.getAuxiliaryField().values().stream().findFirst();
-            if (addressTask.isPresent()) {
-                path = addressTask.get();
-            }
-            createFile = projectDao.createFile(taskId, path);
-        }
-
-        String answerDate = dateTime.toString().substring(0, dateTime.toString().indexOf("."));
-
-        if (createFile != null) {
-            statusTheEnd.setStatus(statusRemote.getStatus() + "\n" + statusTask + "\n" + createFile.getStatus() + answerDate);
-        } else {
-            statusTheEnd.setStatus("Данные задачи обновленны : " + answerDate);
+            statusTheEnd.setStatus(createTaskInRemoteRepositoryAndDB(text, taskName, projectId, dateTime, answerDate));
         }
         return statusTheEnd;
     }
 
+    private String refreshTaskInRemoteRepositoryAndDB(String taskName, String text, Integer projectId, Integer taskId, LocalDateTime dateTime, String answerDate) {
+        Status statusRefresh = taskDao.refreshTask(taskId, taskName, dateTime, projectId);
+        fileRepository.giveTask(dateTime, text, taskName);
+        String statusTask = statusRefresh.getStatus();
+        return statusTask + COLON + answerDate;
+    }
+
+    private String createTaskInRemoteRepositoryAndDB(String text, String taskName, Integer projectId, LocalDateTime dateTime, String answerDate) {
+        Status statusCreate = taskDao.createTask(taskName, dateTime, projectId);
+        String statusTask = statusCreate.getStatus();
+        Status statusRemote = fileRepository.giveTask(dateTime, text, taskName);
+        String path = statusRemote.getAuxiliaryField().values().stream().findFirst().get();
+        Integer taskIdForCreateFile = taskDao.getTaskByName(taskName);
+
+        Status createFile = fileDao.createFile(taskIdForCreateFile, path);
+        return statusRemote.getStatus() + SEMICOLON + statusTask + SEMICOLON + createFile.getStatus() + COLON + answerDate;
+    }
+
     public Status removeTask(Integer taskId) {
 
-        Status deleteTask = projectDao.removeTask(taskId);
-        Status deleteFileTask = projectDao.deleteFile(taskId);
+        Status deleteTask = taskDao.removeTask(taskId);
+        Status deleteFileTask = fileDao.deleteFile(taskId);
 
         boolean deleteRemoteStorage = fileRepository.deleteFileTask(deleteFileTask.getStatus());
 
         Status finishAnswer = new Status();
         if (deleteTask != null && deleteRemoteStorage) {
-            finishAnswer.setStatus(" Задача : " + deleteFileTask.getStatus().substring(0, deleteFileTask.getStatus().indexOf(".")) + " удалена.");
+            finishAnswer.setStatus(WORD_TASK + deleteFileTask.getStatus().substring(0, deleteFileTask.getStatus().indexOf(SYMBOL_POINT)) + WORD_DELETED);
         } else if (!deleteRemoteStorage) {
-            finishAnswer.setStatus("Задача не удалена");
+            finishAnswer.setStatus(THE_TASK_DID_NOT_REMOVE);
         }
         return finishAnswer;
     }
 
     public Status assignAnExecutorToTask(Integer taskId, Integer workerId) {
-        return projectDao.assignAnExecutorToTask(taskId, workerId);
+        return taskDao.assignAnExecutorToTask(taskId, workerId);
     }
 
     public Status removeExecutorFromTask(Integer taskId, Integer workerId) {
-        return projectDao.removeExecutorFromTask(taskId, workerId);
+        return taskDao.removeExecutorFromTask(taskId, workerId);
     }
 
     @Transactional(readOnly = true)
     public ProjectDto getAllExecutorProjectsByProjectId(Integer projectId) {
-
-        List<Integer> taskList = new ArrayList<>();
-        Map<String, String> taskMap = new HashMap<>();
-        Map<String, String> textTask = new HashMap<>();
         ProjectDto projectDto;
-        Project project = projectDao.getAllInfoByProjectId(projectId);
-        projectDto = mapping.toProject(project);
-        projectDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByProjectId(projectId)));
-
-        for (TaskDto task : projectDto.getTasks()) {
-            taskList.add(task.getId());
+        try {
+            projectDto = mapping.toProject(projectDao.getAllInfoByProjectId(projectId));
+            projectDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByProjectId(projectId)));
+            projectDto.getTasks().forEach(
+                    taskDto -> taskDto.setTextTask(fileRepository.getFileTaskByFileId(fileDao.getFilePath(taskDto.getId()).getStatus()))
+            );
+        } catch (Exception e) {
+            throw new RequestProcessingException(THE_BD_DOESNT_HAVE_PROJECT_WITH_THIS_ID, e);
         }
-        for (Integer integer : taskList) {
-            taskMap.put(String.valueOf(integer), projectDao.getFilePath(integer).getStatus());
-        }
-        for (Map.Entry<String, String> stringStringEntry : taskMap.entrySet()) {
-            if (!stringStringEntry.getValue().equals("Файла с таким ID нет в базе данных.")) {
-                log.info("СЕРВИС : {}", stringStringEntry.getKey());
-                textTask.put(stringStringEntry.getKey(),
-                        fileRepository.getFileTaskByFileId(stringStringEntry.getValue()));
-            }
-        }
-        for (Map.Entry<String, String> stringStringEntry : textTask.entrySet()) {
-
-            for (TaskDto task : projectDto.getTasks()) {
-                if (task.getId() == Integer.valueOf(stringStringEntry.getKey())) {
-                    if (stringStringEntry.getValue() != null) {
-                        task.setTextTask(stringStringEntry.getValue());
-                    }
-                }
-            }
-        }
-
         return projectDto;
     }
 
     @Transactional(readOnly = true)
     public FullWorkerDto getAllInfoByWorkerId(Integer workerId) {
         FullWorkerDto workerDto = new FullWorkerDto();
-        Worker worker = projectDao.getAllInfoByWorkerId(workerId);
-        workerDto.setWorker(mapping.toFullWorker(worker));
-        workerDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByWorkerId(workerId)));
+
+        try {
+            workerDto.setWorker(mapping.toFullWorker(workerDao.getAllInfoByWorkerId(workerId)));
+            workerDto.setTasks(mapping.toDtoList(projectDao.getAllProjectTasksByWorkerId(workerId)));
+        } catch (Exception e) {
+            throw new RequestProcessingException(THE_DB_DOESNT_HAVE_WORKER_WITH_THIS_ID, e);
+        }
         return workerDto;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
