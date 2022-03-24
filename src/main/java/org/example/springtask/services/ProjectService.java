@@ -15,11 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service(value = "projectService")
 public class ProjectService {
 
+    public static final String VALIDATION_TASK_NAME = "Введите корректное название задачи. Использовать стиль написани CamelCase нельзя";
     private ProjectDAO projectDao;
     private FileRepository fileRepository;
     private ProjectMapping mapping;
@@ -159,32 +162,43 @@ public class ProjectService {
         Integer taskId;
         LocalDateTime dateTime = LocalDateTime.now();
 
-        Status statusRemote = fileRepository.giveTask(dateTime, text, taskName);
+        if (validationOnCamelCase(taskName)){
+            statusTheEnd.setStatus(VALIDATION_TASK_NAME);
+        }else{
+            Status statusRemote = fileRepository.giveTask(dateTime, text, taskName);
 
-        taskId = projectDao.getTaskByName(taskName);
-
-        if (taskId > 0) {
-            statusRefresh = projectDao.refreshTask(taskId, taskName, dateTime, projectId);
-            statusTask = statusRefresh.getStatus();
-        } else {
-            statusCreate = projectDao.createTask(taskName, dateTime, projectId);
-            statusTask = statusCreate.getStatus();
             taskId = projectDao.getTaskByName(taskName);
-            Optional<String> addressTask = statusRemote.getAuxiliaryField().values().stream().findFirst();
-            if (addressTask.isPresent()) {
-                path = addressTask.get();
+
+            if (taskId > 0) {
+                statusRefresh = projectDao.refreshTask(taskId, taskName, dateTime, projectId);
+                statusTask = statusRefresh.getStatus();
+            } else {
+                statusCreate = projectDao.createTask(taskName, dateTime, projectId);
+                statusTask = statusCreate.getStatus();
+                taskId = projectDao.getTaskByName(taskName);
+                Optional<String> addressTask = statusRemote.getAuxiliaryField().values().stream().findFirst();
+                if (addressTask.isPresent()) {
+                    path = addressTask.get();
+                }
+                createFile = projectDao.createFile(taskId, path);
             }
-            createFile = projectDao.createFile(taskId, path);
-        }
 
-        String answerDate = dateTime.toString().substring(0, dateTime.toString().indexOf("."));
+            String answerDate = dateTime.toString().substring(0, dateTime.toString().indexOf("."));
 
-        if (createFile != null) {
-            statusTheEnd.setStatus(statusRemote.getStatus() + "\n" + statusTask + "\n" + createFile.getStatus() + answerDate);
-        } else {
-            statusTheEnd.setStatus("Данные задачи обновленны : " + answerDate);
+            if (createFile != null) {
+                statusTheEnd.setStatus(statusRemote.getStatus() + "\n" + statusTask + "\n" + createFile.getStatus() + answerDate);
+            } else {
+                statusTheEnd.setStatus("Данные задачи обновленны : " + answerDate);
+            }
         }
         return statusTheEnd;
+    }
+
+    private boolean validationOnCamelCase(String taskName) {
+        String reg = "(\\S[A-Z])";
+        Pattern pattern = Pattern.compile(reg);
+        Matcher matcher = pattern.matcher(taskName);
+        return matcher.find();
     }
 
     public Status removeTask(Integer taskId) {
