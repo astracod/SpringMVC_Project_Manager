@@ -13,7 +13,5 @@ public class WorkerWithProjectsDto {
 
     private String lastName;
 
-    private List<ProjectInfoForWorkerDto> projects;
-
-
+    private List<OnlyProjectInfoDto> projects;
 }
